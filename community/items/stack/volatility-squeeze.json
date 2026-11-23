@@ -1,0 +1,9 @@
+{
+  "id": "volatility-squeeze",
+  "kind": "stack",
+  "name": "Volatility squeeze",
+  "description": "Bollinger Bands inside Keltner Channels, with band width below, to spot quiet periods before a breakout.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["volatility", "breakout", "swing"]
+}

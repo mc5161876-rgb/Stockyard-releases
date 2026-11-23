@@ -1,0 +1,10 @@
+{
+  "name": "Scalper",
+  "description": "EMA 9 / 21, VWAP and Stoch RSI for fast intraday entries",
+  "indicators": [
+    { "type": "ema", "params": { "length": 9, "source": "close" }, "colors": {}, "visible": true },
+    { "type": "ema", "params": { "length": 21, "source": "close" }, "colors": {}, "visible": true },
+    { "type": "vwap", "params": { "anchor": "day" }, "colors": {}, "visible": true },
+    { "type": "stochrsi", "params": { "smoothK": 3, "smoothD": 3, "rsiLength": 14, "stochLength": 14, "source": "close", "upper": 80, "lower": 20 }, "colors": {}, "visible": true }
+  ]
+}

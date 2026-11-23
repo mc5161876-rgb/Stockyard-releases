@@ -1,0 +1,9 @@
+{
+  "id": "crypto-majors",
+  "kind": "workspace",
+  "name": "Crypto majors",
+  "description": "A 2 × 2 grid with BTC, ETH, SOL and XRP on the hourly chart, crosshairs linked.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["crypto", "multi-chart"]
+}

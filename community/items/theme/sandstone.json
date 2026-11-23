@@ -1,0 +1,9 @@
+{
+  "id": "sandstone",
+  "kind": "theme",
+  "name": "Sandstone",
+  "description": "A warm light theme in paper and clay tones, for bright rooms and daytime trading.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["light", "warm"]
+}

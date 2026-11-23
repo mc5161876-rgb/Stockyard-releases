@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feature guide · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html" aria-current="page">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Feature guide</h1>
+<p>This page lists what each part of Stockyard does and where to find it. Almost every choice on this page is a setting. Change it from <strong>Customize</strong> in the top bar, from <strong>Settings</strong> (the gear, or ⌘, on Mac), or from the panel itself.</p>
+<h2 id="charts"><a class="anchor" href="#charts">Charts</a></h2>
+<ul>
+<li><strong>Symbols.</strong> Start typing anywhere, or press <code>/</code>, to search crypto and stocks together.</li>
+<li><strong>Timeframes.</strong> Pick a favorite in the top bar, choose from the menu, or type your own, such as <code>2h</code>, <code>45</code>, or <code>3D</code>. Weeks, months, and years work too.</li>
+<li><strong>Chart types.</strong> Candles, hollow candles, Heikin Ashi, bars, line, area, and baseline.</li>
+<li><strong>Chart settings.</strong> Candle colors, status line, log and percent scales, a countdown to bar close, background, grid, crosshair, and watermark. Open them from <strong>Settings → Chart</strong> or by right-clicking the chart.</li>
+<li><strong>Reset the view.</strong> Right-click the chart and choose <strong>Reset chart view</strong>, or press Alt+R.</li>
+<li><strong>History.</strong> Scroll left to load older bars.</li>
+</ul>
+<h2 id="indicators"><a class="anchor" href="#indicators">Indicators</a></h2>
+<ul>
+<li>Click <strong>ƒx Indicators</strong> to open the shop. It has 60 built-in indicators with TradingView&#39;s default settings, such as moving averages, VWAP, Bollinger Bands, Ichimoku, SuperTrend, MACD, RSI, and Stochastic.</li>
+<li>Every indicator shows a live preview on your current chart before you add it.</li>
+<li>Point at an indicator in the chart legend to hide it, remove it, or open its settings.</li>
+<li><strong>Stacks</strong> save the indicators on your chart as a named set. Five starter stacks are included.</li>
+<li><strong>Your own indicators.</strong> Write one, paste code, or import a <code>.ts</code> or <code>.js</code> file. Read <a href="custom-indicators.html">writing your own indicator</a>.</li>
+</ul>
+<h2 id="drawing-tools"><a class="anchor" href="#drawing-tools">Drawing tools</a></h2>
+<ul>
+<li>The rail on the left holds more than 50 tools: lines, channels, pitchforks, Fibonacci and Gann tools, chart patterns, Elliott waves, ranges, long and short positions, shapes, brushes, arrows, and text.</li>
+<li><strong>Snap to candles</strong> is on by default. Points snap to a candle&#39;s open, high, low, or close. Hold ⌘ or Ctrl to turn snapping off while you draw.</li>
+<li>Hold Shift to keep a line horizontal, vertical, or at 45°.</li>
+<li>Click a drawing to select it. Drag it to move it, or drag its handles to reshape it. The style bar sets color, thickness, line style, lock, copy, and delete.</li>
+<li>Drawings are saved per symbol and show on every timeframe.</li>
+<li>Undo with ⌘Z, redo with ⇧⌘Z, and delete with the Delete key.</li>
+<li><strong>Customize toolbar</strong>, at the bottom of the rail, lets you star favorite tools, reorder them, and hide groups.</li>
+</ul>
+<h2 id="layouts-and-workspaces"><a class="anchor" href="#layouts-and-workspaces">Layouts and workspaces</a></h2>
+<ul>
+<li>Click the layout button in the top bar to show one to eight charts at once.</li>
+<li>Drag, resize, and lock each chart box when you use a free layout.</li>
+<li>Charts can share their symbol, timeframe, or crosshair.</li>
+<li><strong>Workspaces</strong> save the whole screen: layout, symbols, and indicators. Switch between them from the workspace menu.</li>
+</ul>
+<h2 id="alerts"><a class="anchor" href="#alerts">Alerts</a></h2>
+<ul>
+<li>Click <strong>Alert</strong>, or press Alt+A, to create a price alert. You can also right-click the chart, or select a drawing, to alert on it.</li>
+<li>Alerts fire a desktop notification and a sound, even when Stockyard is in the background.</li>
+<li>Click the bell to open the alert manager. Pause, resume, edit, or delete alerts there, and see the log of fired alerts.</li>
+<li>Drag an alert line on the chart to change its price.</li>
+</ul>
+<h2 id="screener"><a class="anchor" href="#screener">Screener</a></h2>
+<ul>
+<li>Click <strong>Screener</strong> in the top bar to filter the whole market by price, volume, and indicators.</li>
+<li>Click a result to open it on the chart.</li>
+</ul>
+<h2 id="options-chain"><a class="anchor" href="#options-chain">Options chain</a></h2>
+<ul>
+<li>Open a US stock and click the options chain button in the top bar. The chain shows that stock&#39;s options, or type another ticker into the panel.</li>
+<li>Pick an expiration from the row of dates. <strong>W</strong> marks a weekly and <strong>M</strong> a monthly.</li>
+<li>Calls sit on the left, puts on the right, and the strike nearest the stock&#39;s price is highlighted. A line marks where the price is.</li>
+<li>Click a contract to chart it, such as <code>AAPL Dec 18 &#39;26 230 C</code>. Point at a contract and click <strong>+</strong> to add it to your watchlist.</li>
+<li>The <strong>⋯</strong> menu picks the columns (bid, ask, volume, open interest, IV, and greeks), how many strikes to show, and whether to show calls and puts side by side or one at a time.</li>
+<li>The chain refreshes every 15 seconds. It needs a Tradier or Alpaca account, the same as US stocks.</li>
+</ul>
+<h2 id="bar-replay"><a class="anchor" href="#bar-replay">Bar replay</a></h2>
+<ul>
+<li>Click <strong>Replay</strong> and pick a starting bar. The chart hides everything after that bar.</li>
+<li>Press play to bring candles back one at a time at the speed you choose. Use replay to practice reading a chart without knowing what comes next.</li>
+</ul>
+<h2 id="watchlist"><a class="anchor" href="#watchlist">Watchlist</a></h2>
+<ul>
+<li>The watchlist shows logo, symbol, last price, change, and change % in sections you can collapse.</li>
+<li>Switch between the list view and the heatmap view.</li>
+<li>Drag rows to reorder them. Double-click a section to rename it.</li>
+</ul>
+<h2 id="themes"><a class="anchor" href="#themes">Themes</a></h2>
+<ul>
+<li>Stockyard has 13 themes, including light ones. Six have a moving background: Aurora, Synthwave, Digital rain, Deep space, Ember, and Ocean.</li>
+<li>Make your own in <strong>Settings → Themes</strong>. Set every color, the moving background, its strength, and its speed.</li>
+<li>Share a theme as a short code. Paste a code to import someone else&#39;s theme.</li>
+<li>Animation follows your computer&#39;s reduce-motion setting. You can also set it to <strong>Full</strong>, <strong>Calm</strong>, or <strong>Off</strong>.</li>
+</ul>
+<h2 id="widgets"><a class="anchor" href="#widgets">Widgets</a></h2>
+<ul>
+<li>Open the widgets menu in the top bar to add boxes that float over the chart.</li>
+<li>Built-in widgets: live sports scores, an X feed (with your own X API key), prices, mini charts, a market clock, Crypto Fear &amp; Greed, notes, and a position size calculator.</li>
+<li>Drag a widget to move it, drag an edge to resize it, and collapse or lock it from its title bar.</li>
+<li>Plugins add more widgets and themes. Read <a href="plugins.html">plugins</a>.</li>
+</ul>
+<h2 id="ai-agents"><a class="anchor" href="#ai-agents">AI agents</a></h2>
+<p>An AI agent can run Stockyard for you: set up charts, add indicators, draw, create alerts, change themes, and more. You choose how much it may do. Read <a href="agents.html">what an agent can do</a>.</p>
+<p>The <a href="assistant.html">assistant</a> does the same from a chat beside your charts, with your own Anthropic or OpenAI key or a free local model through Ollama.</p>
+<h2 id="data-sources"><a class="anchor" href="#data-sources">Data sources</a></h2>
+<ul>
+<li><strong>Crypto</strong> comes from Coinbase. It works with no account.</li>
+<li><strong>US stocks, ETFs, and options</strong> come from your own Tradier account or a free Alpaca account. Set them up in <strong>Settings → Data sources</strong>, in the desktop app.<ul>
+<li><strong>Alpaca</strong> is free with a paper trading account, with no deposit. Live prices are trades on the IEX exchange, history covers the whole market up to 15 minutes ago, and options quotes are delayed.</li>
+<li><strong>Tradier</strong> gives real-time data with a brokerage account, or delayed data with a free developer sandbox.</li>
+<li><strong>US stocks data source</strong> picks which one serves stocks: <strong>Auto</strong> uses Tradier when its token is saved and Alpaca otherwise, or choose <strong>Tradier</strong> or <strong>Alpaca</strong> yourself. Charts and watchlists switch over right away.</li>
+</ul>
+</li>
+<li>The badges in the top-right corner show each source&#39;s status: Live, Reconnecting, Rate limited, or Set up. Click a badge to open its settings.</li>
+</ul>
+<h2 id="updates"><a class="anchor" href="#updates">Updates</a></h2>
+<p>Stockyard checks for a new version each time it starts. When one is ready, click <strong>Update &amp; restart</strong>. Updates are signed, so the app installs only builds that come from the Stockyard project.</p>
+</main>
+</div>
+</body>
+</html>

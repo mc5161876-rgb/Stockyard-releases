@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html" aria-current="page">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Getting started</h1>
+<p>In about five minutes you will install Stockyard, open a live Bitcoin chart, add an indicator, and save a watchlist.</p>
+<h2 id="install-stockyard"><a class="anchor" href="#install-stockyard">Install Stockyard</a></h2>
+<ol>
+<li>Open the <a href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">latest release</a>.</li>
+<li>Download the installer for your computer:<ul>
+<li><strong>Mac</strong> (Apple Silicon or Intel): the <code>.dmg</code> file.</li>
+<li><strong>Windows</strong>: the <code>-setup.exe</code> file.</li>
+</ul>
+</li>
+<li>Install the app:<ul>
+<li><strong>Mac:</strong> open the <code>.dmg</code> and drag <strong>Stockyard</strong> into <strong>Applications</strong>.</li>
+<li><strong>Windows:</strong> run the <code>.exe</code>.</li>
+</ul>
+</li>
+</ol>
+<p>The installers are not signed with a paid Apple or Microsoft developer account yet, so your computer asks once before the first launch:</p>
+<ul>
+<li><strong>Mac:</strong> open Stockyard and click <strong>Done</strong> on the warning. Then open <strong>System Settings → Privacy &amp; Security</strong>, scroll down, and click <strong>Open Anyway</strong>.</li>
+<li><strong>Windows:</strong> if SmartScreen appears, click <strong>More info → Run anyway</strong>.</li>
+</ul>
+<p>Stockyard updates itself after that. When a new version is out, a banner offers <strong>Update &amp; restart</strong>.</p>
+<h2 id="take-the-tour"><a class="anchor" href="#take-the-tour">Take the tour</a></h2>
+<p>On first launch, a short tour points at each part of the app. Click <strong>Next</strong> or press the right arrow key to move through it. Press <strong>Esc</strong> to leave it at any time.</p>
+<p>To see the tour again, open <strong>Settings → About</strong> and click <strong>Take the tour again</strong>.</p>
+<h2 id="open-a-chart"><a class="anchor" href="#open-a-chart">Open a chart</a></h2>
+<ol>
+<li>Type <code>ETH</code> anywhere in the window. A search box opens with your letters in it.</li>
+<li>Choose <strong>ETH-USD</strong>. The chart switches to Ethereum and streams live trades.</li>
+<li>Click <strong>1h</strong> in the timeframe bar. You can also type a timeframe such as <code>2h</code> or <code>3D</code> into the timeframe menu.</li>
+</ol>
+<h2 id="add-an-indicator"><a class="anchor" href="#add-an-indicator">Add an indicator</a></h2>
+<ol>
+<li>Click <strong>ƒx Indicators</strong>.</li>
+<li>Search for <code>RSI</code> and click it. A new panel with the RSI line appears under the chart.</li>
+<li>Point at the RSI name in the chart legend and click the gear to change its length, colors, or line style.</li>
+</ol>
+<p>To save the indicators you have on the chart as one set, open <strong>ƒx Indicators → Stacks</strong> and click <strong>Save stack</strong>. Apply the stack to any chart later with one click.</p>
+<h2 id="build-a-watchlist"><a class="anchor" href="#build-a-watchlist">Build a watchlist</a></h2>
+<ol>
+<li>Open the watchlist on the right. If it is hidden, click <strong>Watchlist</strong> in the top-right corner.</li>
+<li>Click <strong>Add symbol</strong> (the <strong>+</strong> at the top of the panel) and add a few symbols.</li>
+<li>Drag a row to reorder it. Click a row to open that symbol on the chart.</li>
+</ol>
+<p>To see the same list as colored tiles, switch the watchlist view to <strong>Heatmap</strong>.</p>
+<h2 id="add-us-stocks-optional"><a class="anchor" href="#add-us-stocks-optional">Add US stocks (optional)</a></h2>
+<p>Crypto works with no account. For US stocks, ETFs, and options, connect a free Alpaca account or your Tradier account. Alpaca is the quickest to set up:</p>
+<ol>
+<li>Make a free account at <a href="https://app.alpaca.markets/signup" target="_blank" rel="noopener">alpaca.markets</a>. You don&#39;t need to deposit money.</li>
+<li>On your paper trading dashboard, open <strong>API Keys</strong> and generate a key.</li>
+<li>In Stockyard, open <strong>Settings → Data sources</strong>, paste the key ID and the secret into the Alpaca card, and click <strong>Save &amp; test</strong>.</li>
+</ol>
+<p>To use Tradier instead, paste your Tradier token into the Tradier card. A free developer sandbox gives delayed data, and a brokerage account gives real-time data. If you connect both, <strong>US stocks data source</strong> picks which one Stockyard uses.</p>
+<p>Stockyard tests your keys, then saves them in your computer&#39;s keychain. Stocks such as <code>AAPL</code> and <code>SPY</code> now appear in search next to crypto, and the options chain button in the top bar shows their options.</p>
+<h2 id="next-steps"><a class="anchor" href="#next-steps">Next steps</a></h2>
+<ul>
+<li>Read the <a href="features.html">feature guide</a> for everything else on screen.</li>
+<li>Let an AI agent set things up for you. Read <a href="agents.html">what an agent can do</a>.</li>
+</ul>
+</main>
+</div>
+</body>
+</html>

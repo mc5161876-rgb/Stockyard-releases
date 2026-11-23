@@ -1,0 +1,9 @@
+{
+  "id": "evergreen",
+  "kind": "theme",
+  "name": "Evergreen",
+  "description": "Deep forest greens with a slow green aurora drifting behind the chart.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["dark", "green", "animated"]
+}

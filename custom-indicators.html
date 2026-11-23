@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing your own indicator · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html" aria-current="page">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Writing your own indicator</h1>
+<p>Stockyard indicators are small TypeScript or JavaScript files. Open <strong>Indicators → + Your own</strong> to write or paste one, or <strong>Import file</strong> (or drag a <code>.ts</code>/<code>.js</code> file onto the shop) to add one someone shared. The editor test-runs the code as you type and shows what&#39;s wrong in plain words.</p>
+<pre><code class="language-ts">export default indicator({
+  name: &quot;EMA Trend Bands&quot;,
+  shortName: &quot;EMA Bands&quot;,          // shown in the chart legend
+  description: &quot;An EMA with bands one ATR above and below it.&quot;,
+  placement: &quot;overlay&quot;,            // &quot;overlay&quot; = on the price chart, &quot;pane&quot; = own panel below
+  inputs: {
+    length: input.length(21, &quot;EMA length&quot;),
+    mult: input.float(1, &quot;ATR multiplier&quot;, { min: 0.1, max: 10 }),
+    source: input.source(&quot;close&quot;),
+  },
+  plots: {
+    basis: { label: &quot;EMA&quot;, color: &quot;#8b7bff&quot; },
+    upper: { label: &quot;Upper&quot;, lineWidth: 1 },
+    lower: { label: &quot;Lower&quot;, lineWidth: 1 },
+  },
+  compute(bars, inputs) {
+    const price = ta.source(bars, inputs.source);
+    const basis = ta.ema(price, inputs.length);
+    const atr = ta.atr(bars, 14);
+    return {
+      basis,
+      upper: ta.zip((b, a) =&gt; b + inputs.mult * a, basis, atr),
+      lower: ta.zip((b, a) =&gt; b - inputs.mult * a, basis, atr),
+    };
+  },
+});
+</code></pre>
+<h2 id="what-the-code-gets"><a class="anchor" href="#what-the-code-gets">What the code gets</a></h2>
+<ul>
+<li><code>bars</code>: the chart&#39;s candles, oldest first: <code>{ time, open, high, low, close, volume }</code>.</li>
+<li><code>inputs</code>: the current settings, keyed like <code>inputs</code> above. Numbers are numbers, <code>input.bool</code> is <code>true</code>/<code>false</code>.</li>
+<li><code>ta</code>: the same building blocks the built-in indicators use (see <code>src/indicators/ta.ts</code>): <code>sma ema rma wma hma dema tema vwma alma kama mcginley linreg ma</code>, <code>rsi stoch dmi atr tr obv accdist vwap</code>, <code>sum highest lowest highestBars lowestBars stdev dev correlation logReturns change mom roc cum shift</code>, <code>zip map crossover crossunder source</code>. Each takes and returns one value per bar, with <code>undefined</code> while warming up.</li>
+<li><code>input</code>: <code>length</code> (a bar count), <code>int</code>, <code>float</code>, <code>source</code>, <code>select(default, options)</code>, <code>bool</code>.</li>
+</ul>
+<p><code>compute</code> returns one array per plot (or a single array when there&#39;s one plot). <code>NaN</code>, <code>null</code> and missing values become gaps.</p>
+<h2 id="plot-options"><a class="anchor" href="#plot-options">Plot options</a></h2>
+<p><code>label</code>, <code>color</code> (hex or rgb/rgba), <code>lineWidth</code> 1–4, <code>style</code>: <code>line</code>, <code>step</code>, <code>dots</code> or <code>histogram</code>. Histograms take <code>colorMode</code>: <code>sign</code> (above/below zero), <code>change</code> (rising/falling), <code>candle</code> (candle direction) or <code>macd</code> (four shades).</p>
+<p>Indicator-level options: <code>levels: [70, 30]</code> (dashed guide lines in a pane), <code>range: [0, 100]</code> (fixed pane scale), <code>format: &quot;price&quot; | &quot;volume&quot; | &quot;number&quot;</code>, <code>warmup</code> (bars of history needed), <code>author</code>, <code>version</code>, <code>category</code>.</p>
+<h2 id="safety"><a class="anchor" href="#safety">Safety</a></h2>
+<p>Custom indicators run in a separate sandbox thread. They see only the chart&#39;s candles: no access to the app, your settings, your API keys, files or the internet. One that runs longer than 4 seconds is stopped and marked as stuck until its code changes.</p>
+</main>
+</div>
+</body>
+</html>

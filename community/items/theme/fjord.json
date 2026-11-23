@@ -1,0 +1,9 @@
+{
+  "id": "fjord",
+  "kind": "theme",
+  "name": "Fjord",
+  "description": "Cool arctic blues and soft frost greens. Easy on the eyes for long sessions.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["dark", "calm", "blue"]
+}

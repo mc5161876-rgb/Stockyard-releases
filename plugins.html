@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stockyard plugins · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html" aria-current="page">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Stockyard plugins</h1>
+<p>A plugin adds widgets and themes to Stockyard. It is one JavaScript module file. People install it from <strong>Settings → Widgets &amp; plugins → Add plugin file</strong>. <a href="community/items/plugin/big-movers.plugin.js"><code>community/items/plugin/big-movers.plugin.js</code></a> is a complete example.</p>
+<pre><code class="language-js">// @name My plugin
+export default function activate(stockyard) {
+  stockyard.registerWidget({
+    id: &quot;me.hello&quot;,
+    name: &quot;Hello&quot;,
+    description: &quot;Says hello&quot;,
+    icon: &quot;👋&quot;,
+    defaultSize: { w: 220, h: 120 },
+    defaultConfig: { who: &quot;world&quot; },
+    settings: [{ key: &quot;who&quot;, label: &quot;Who&quot;, type: &quot;text&quot; }],
+    mount(el, ctx) {
+      el.textContent = `Hello, ${ctx.config.who}`;
+      return { update: (ctx) =&gt; (el.textContent = `Hello, ${ctx.config.who}`) };
+    },
+  });
+}
+</code></pre>
+<p>The <code>// @name</code> line sets the name shown in Settings. Installing a file with the same name replaces the old version. <code>activate</code> may return a cleanup function.</p>
+<h2 id="api-apiversion-1"><a class="anchor" href="#api-apiversion-1">API (<code>apiVersion: 1</code>)</a></h2>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>registerWidget(def)</code></td>
+<td>Adds a widget type to the Widgets menu. Returns a function that removes it.</td>
+</tr>
+<tr>
+<td><code>registerTheme(theme)</code></td>
+<td>Adds a theme. Fields match the theme editor: <code>bg</code>, <code>panel</code>, <code>panelAlt</code>, <code>border</code>, <code>hover</code>, <code>grid</code>, <code>text</code>, <code>muted</code>, <code>up</code>, <code>down</code>, <code>crosshair</code>, <code>accent</code>, <code>palette</code>, <code>light</code>, and <code>animation: { kind, intensity, speed, colors }</code> with <code>kind</code> one of <code>aurora</code>, <code>synthwave</code>, <code>rain</code>, <code>starfield</code>, <code>embers</code>, <code>waves</code>, <code>pulse</code>. Invalid colors fall back to the default theme.</td>
+</tr>
+<tr>
+<td><code>getTheme()</code></td>
+<td>The active theme&#39;s colors. Widgets can also use the CSS variables <code>--bg</code>, <code>--panel</code>, <code>--panel-alt</code>, <code>--border</code>, <code>--hover</code>, <code>--text</code>, <code>--muted</code>, <code>--up</code>, <code>--down</code>, <code>--accent</code>.</td>
+</tr>
+<tr>
+<td><code>openSymbol(symbol)</code></td>
+<td>Shows a symbol on the main chart: <code>BTC-USD</code>, or <code>tradier:AAPL</code> for stocks.</td>
+</tr>
+<tr>
+<td><code>markets.getBars(symbol, timeframe, { from, to })</code></td>
+<td>Historical candles (times in Unix seconds).</td>
+</tr>
+<tr>
+<td><code>markets.subscribeQuotes(symbols, onQuote)</code></td>
+<td>Live <code>{ symbol, last, reference, high24h, low24h, volume24h }</code>. Returns an unsubscribe function.</td>
+</tr>
+<tr>
+<td><code>markets.search(text)</code></td>
+<td>Symbol search.</td>
+</tr>
+<tr>
+<td><code>getJson(url)</code></td>
+<td>GET a JSON URL. In the desktop app only hosts Stockyard allows can be reached.</td>
+</tr>
+<tr>
+<td><code>React</code></td>
+<td>React, for plugins that want <code>React.createElement</code> and hooks in a <code>component</code>.</td>
+</tr>
+<tr>
+<td><code>appVersion</code></td>
+<td>The Stockyard version.</td>
+</tr>
+</tbody></table>
+<h2 id="widget-definition"><a class="anchor" href="#widget-definition">Widget definition</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>Unique. Prefix it with your name, like <code>acme.weather</code>.</td>
+</tr>
+<tr>
+<td><code>name</code>, <code>description</code>, <code>icon</code></td>
+<td>Shown in the Widgets menu. <code>icon</code> is an emoji or a short text.</td>
+</tr>
+<tr>
+<td><code>defaultSize</code>, <code>minSize</code></td>
+<td>In pixels.</td>
+</tr>
+<tr>
+<td><code>defaultConfig</code></td>
+<td>The widget&#39;s own settings, saved per placed widget.</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>Fields Stockyard draws in the widget&#39;s settings panel: <code>text</code>, <code>textarea</code>, <code>number</code>, <code>toggle</code>, <code>select</code>.</td>
+</tr>
+<tr>
+<td><code>settingsNote</code></td>
+<td>A note at the top of that panel.</td>
+</tr>
+<tr>
+<td><code>mount(el, ctx)</code></td>
+<td>Draw into <code>el</code>. Return <code>{ update(ctx), destroy() }</code> (both optional). <code>update</code> runs when the config, size or theme changes.</td>
+</tr>
+<tr>
+<td><code>component</code></td>
+<td>A React component that gets <code>ctx</code> as props, instead of <code>mount</code>.</td>
+</tr>
+</tbody></table>
+<p><code>ctx</code> has <code>config</code>, <code>setConfig(patch)</code>, <code>width</code>, <code>height</code>, <code>theme</code>, <code>openSymbol(symbol)</code>, <code>setTitle(text)</code> and <code>openSettings()</code>.</p>
+<h2 id="what-a-plugin-can-reach"><a class="anchor" href="#what-a-plugin-can-reach">What a plugin can reach</a></h2>
+<p>A plugin runs inside Stockyard with the same access as the app&#39;s own code. It can read prices and settings. It cannot read the Alpaca, Tradier or X keys, which stay in the system keychain and are used only by the desktop backend. Network access is limited to the hosts Stockyard allows. A widget that crashes shows an error in its own box and doesn&#39;t affect the rest of the app. Turning a plugin off removes its widgets and themes right away.</p>
+</main>
+</div>
+</body>
+</html>

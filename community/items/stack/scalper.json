@@ -1,0 +1,9 @@
+{
+  "id": "scalper",
+  "kind": "stack",
+  "name": "Scalper",
+  "description": "EMA 9 and 21 for direction, session VWAP for value, and Stoch RSI for timing entries.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["intraday", "fast"]
+}

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contributing · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html" aria-current="page">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Contributing</h1>
+<p>Stockyard is a <a href="https://tauri.app" target="_blank" rel="noopener">Tauri</a> desktop app. The window is a React and TypeScript web app, and a small Rust backend holds API keys and the Tradier and Alpaca streams. Charts are drawn with TradingView Lightweight Charts.</p>
+<h2 id="set-up-your-computer"><a class="anchor" href="#set-up-your-computer">Set up your computer</a></h2>
+<p>Install these once:</p>
+<ol>
+<li><strong>Node.js 22</strong> from <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>.</li>
+<li><strong>Rust</strong> from <a href="https://rustup.rs" target="_blank" rel="noopener">rustup.rs</a>.</li>
+<li>Platform build tools:<ul>
+<li><strong>Mac:</strong> run <code>xcode-select --install</code> in Terminal.</li>
+<li><strong>Windows:</strong> install <a href="https://visualstudio.microsoft.com/visual-cpp-build-tools/" target="_blank" rel="noopener">Microsoft C++ Build Tools</a> with <strong>Desktop development with C++</strong>.</li>
+</ul>
+</li>
+</ol>
+<p>Then, in the repository folder:</p>
+<pre><code class="language-bash">npm install
+npm run app
+</code></pre>
+<p>The first <code>npm run app</code> compiles the Rust shell and takes a few minutes. Later launches take seconds.</p>
+<h2 id="commands"><a class="anchor" href="#commands">Commands</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>npm run app</code></td>
+<td>Desktop app with hot reload</td>
+</tr>
+<tr>
+<td><code>npm run dev</code></td>
+<td>Web UI only, at <a href="http://localhost:1420" target="_blank" rel="noopener">http://localhost:1420</a>. Crypto works here. US stocks need the desktop app.</td>
+</tr>
+<tr>
+<td><code>npm test</code></td>
+<td>Unit tests (Vitest)</td>
+</tr>
+<tr>
+<td><code>npm run e2e</code></td>
+<td>End-to-end tests: the real app in a browser, against a fake market and a fake desktop backend (Playwright)</td>
+</tr>
+<tr>
+<td><code>npm run typecheck</code></td>
+<td>TypeScript checks</td>
+</tr>
+<tr>
+<td><code>npm run docs</code></td>
+<td>Build this docs site into <code>site/</code></td>
+</tr>
+<tr>
+<td><code>npm run app:build</code></td>
+<td>Build an installer for your computer</td>
+</tr>
+</tbody></table>
+<h2 id="how-the-code-is-laid-out"><a class="anchor" href="#how-the-code-is-laid-out">How the code is laid out</a></h2>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>What lives there</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>src/data/</code></td>
+<td>Market data. <code>types.ts</code> holds the <code>MarketDataAdapter</code> interface, the only data type the UI imports. <code>coinbase/</code> serves crypto. US stocks go through <code>StocksAdapter.ts</code>, which serves them from <code>tradier/</code> or <code>alpaca/</code>.</td>
+</tr>
+<tr>
+<td><code>src/chart/</code></td>
+<td>The Lightweight Charts wrapper, live bars, chart settings, and the right-click menu.</td>
+</tr>
+<tr>
+<td><code>src/indicators/</code></td>
+<td>Indicator math as pure functions (<code>ta.ts</code>), the built-in library, stacks, the shop, and custom indicators.</td>
+</tr>
+<tr>
+<td><code>src/drawings/</code></td>
+<td>Drawing tools: pure geometry, a per-symbol store with undo, the SVG layer, and the tool rail.</td>
+</tr>
+<tr>
+<td><code>src/layout/</code></td>
+<td>Multi-chart layouts, chart linking, and workspaces.</td>
+</tr>
+<tr>
+<td><code>src/alerts/</code></td>
+<td>The alert engine, its store, notifications, and the alert manager.</td>
+</tr>
+<tr>
+<td><code>src/replay/</code></td>
+<td>Bar replay.</td>
+</tr>
+<tr>
+<td><code>src/watchlist/</code></td>
+<td>The watchlist panel.</td>
+</tr>
+<tr>
+<td><code>src/options/</code></td>
+<td>The options chain panel, and its chain logic in <code>chain.ts</code>.</td>
+</tr>
+<tr>
+<td><code>src/themes/</code>, <code>src/settings/themes.ts</code></td>
+<td>Themes as data, and animated backgrounds.</td>
+</tr>
+<tr>
+<td><code>src/widgets/</code>, <code>src/plugins/</code></td>
+<td>Floating widgets and the plugin API.</td>
+</tr>
+<tr>
+<td><code>src/onboarding/</code></td>
+<td>The first-run tour. Steps live in <code>steps.ts</code> and point at <code>data-tour</code> attributes.</td>
+</tr>
+<tr>
+<td><code>src/settings/</code></td>
+<td>The settings store. Every UI choice is a named, saved setting.</td>
+</tr>
+<tr>
+<td><code>src-tauri/</code></td>
+<td>The Rust backend. <code>src/tradier.rs</code> and <code>src/alpaca.rs</code> own each provider&#39;s keys, rate limits, and stream.</td>
+</tr>
+<tr>
+<td><code>docs/</code></td>
+<td>This site. Each <code>.md</code> file is one page.</td>
+</tr>
+</tbody></table>
+<h2 id="rules-the-code-follows"><a class="anchor" href="#rules-the-code-follows">Rules the code follows</a></h2>
+<ul>
+<li><strong>Every UI choice is a setting.</strong> Add a named key to <code>src/settings/store.ts</code> instead of hard-coding a look or layout.</li>
+<li><strong>Keys never reach the web view.</strong> The Rust backend reads secrets from the OS keychain. Do not pass a key to the front end, a plugin, an indicator, or an agent tool.</li>
+<li><strong>Read-only.</strong> Stockyard never places orders. Do not add calls to order or account endpoints.</li>
+<li><strong>The UI never imports a provider.</strong> Charts talk to <code>MarketDataAdapter</code> only.</li>
+</ul>
+<h2 id="add-common-things"><a class="anchor" href="#add-common-things">Add common things</a></h2>
+<ul>
+<li><strong>An indicator:</strong> add an entry to <code>src/indicators/library.ts</code>, built from the helpers in <code>ta.ts</code>. It appears in the shop, quick add, stacks, and the settings dialog.</li>
+<li><strong>A data provider:</strong> implement <code>MarketDataAdapter</code> from <code>src/data/types.ts</code> and register it in <code>src/data/registry.ts</code>. Its symbols get a prefix, such as <code>tradier:AAPL</code>, so tickers never collide.</li>
+<li><strong>A tour step:</strong> add a row to <code>TOUR_STEPS</code> in <code>src/onboarding/steps.ts</code>, and put a matching <code>data-tour</code> attribute on the element. A test fails if a step points at an attribute that no longer exists.</li>
+<li><strong>Agent commands for a feature:</strong> add them in <code>src/agent/commands/</code> and map the feature in <code>src/agent/coverage.ts</code>. <a href="testing.html#adding-a-feature-add-its-agent-commands">Testing</a> has the steps.</li>
+<li><strong>A docs page:</strong> add a <code>.md</code> file to <code>docs/</code>, then add it to the <code>PAGES</code> list in <code>scripts/build-docs.mjs</code>.</li>
+</ul>
+<h2 id="tests-and-checks"><a class="anchor" href="#tests-and-checks">Tests and checks</a></h2>
+<p>Each pull request runs typecheck, unit tests, a web build, end-to-end tests and a Rust check. The unit tests also build this docs site and fail on a broken link. Run the same checks before you push:</p>
+<pre><code class="language-bash">npm run typecheck &amp;&amp; npm test &amp;&amp; npm run e2e
+</code></pre>
+<p>Test behavior a user can see, not internal details. <a href="testing.html">Testing</a> shows how to add a test for your feature.</p>
+<h2 id="releases"><a class="anchor" href="#releases">Releases</a></h2>
+<ol>
+<li>Bump the version in <code>src-tauri/tauri.conf.json</code>, <code>package.json</code>, and <code>src-tauri/Cargo.toml</code>.</li>
+<li>Merge to <code>main</code>.</li>
+<li>Run <strong>Actions → Release → Run workflow</strong>.</li>
+</ol>
+<p>The workflow builds a Mac <code>.dmg</code> and a Windows installer, signs the update, and publishes it to the public <a href="https://github.com/mc5161876-rgb/Stockyard-releases" target="_blank" rel="noopener">Stockyard releases</a> repository. Installed apps pick it up on their next launch.</p>
+<p>The docs site publishes itself when a change to <code>docs/</code> reaches <code>main</code>.</p>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control Stockyard with AI agents · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html" aria-current="page">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Control Stockyard with AI agents</h1>
+<p>AI apps such as Claude Desktop and Claude Code can work in Stockyard for you. They can open charts, read prices, draw, add indicators, set alerts, change layouts and themes, and save workspaces. Scripts can do the same through a small local API.</p>
+<p>Stockyard only reads market data. Agents can&#39;t place trades, and they never see your Alpaca, Tradier or X keys.</p>
+<p>To chat with an AI inside Stockyard instead, use <a href="assistant.html">the assistant</a>. It runs the same commands with your own Anthropic or OpenAI key, or a free local model.</p>
+<h2 id="turn-agents-on"><a class="anchor" href="#turn-agents-on">Turn agents on</a></h2>
+<ol>
+<li>Open <strong>Settings</strong> (gear icon or ⌘,) and choose <strong>Agents</strong>.</li>
+<li>Pick an access level:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>What agents can do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Off</strong> (default)</td>
+<td>Nothing. The local server is stopped.</td>
+</tr>
+<tr>
+<td><strong>Read only</strong></td>
+<td>Look at charts, prices, drawings, alerts and settings. Every change is refused with a message that tells the agent to ask you.</td>
+</tr>
+<tr>
+<td><strong>Ask before acting</strong></td>
+<td>Look freely. Each change shows a prompt with the agent&#39;s name and what it wants to do. Press <strong>Allow</strong> or <strong>Deny</strong>. Prompts come one at a time, and a prompt nobody answers is denied after 2 minutes.</td>
+</tr>
+<tr>
+<td><strong>Full control</strong></td>
+<td>Change anything without asking.</td>
+</tr>
+</tbody></table>
+<p>Only you can change the access level. No agent command can read or change it.</p>
+<p>The server listens on <code>127.0.0.1</code> only, so other computers can&#39;t reach it. Web pages in a browser can&#39;t reach it either.</p>
+<h2 id="connect-claude-desktop"><a class="anchor" href="#connect-claude-desktop">Connect Claude Desktop</a></h2>
+<ol>
+<li>In <strong>Settings → Agents</strong>, press <strong>Connect Claude Desktop</strong>. Stockyard adds itself to Claude Desktop&#39;s <code>claude_desktop_config.json</code> and keeps a <code>.bak</code> copy of the old file.</li>
+<li>Quit Claude Desktop completely and open it again.</li>
+</ol>
+<p>Stockyard now shows in Claude&#39;s tools. Stockyard must be open, with agents on, while Claude uses it.</p>
+<p>To add it by hand, put this in <code>claude_desktop_config.json</code>, using the path that <strong>Settings → Agents</strong> shows:</p>
+<pre><code class="language-json">{
+	&quot;mcpServers&quot;: {
+		&quot;stockyard&quot;: { &quot;command&quot;: &quot;/Applications/Stockyard.app/Contents/MacOS/Stockyard&quot;, &quot;args&quot;: [&quot;mcp&quot;] }
+	}
+}
+</code></pre>
+<p>On Windows, <code>command</code> is the path to <code>Stockyard.exe</code>, with each backslash doubled.</p>
+<h2 id="connect-claude-code"><a class="anchor" href="#connect-claude-code">Connect Claude Code</a></h2>
+<p>Run the command that <strong>Settings → Agents</strong> shows, for example:</p>
+<pre><code class="language-bash">claude mcp add stockyard -- &quot;/Applications/Stockyard.app/Contents/MacOS/Stockyard&quot; mcp
+</code></pre>
+<p>Any other MCP client works the same way: run the Stockyard program with the argument <code>mcp</code>. It speaks MCP over stdin and stdout and passes each message to the open app. It never opens a window.</p>
+<h2 id="use-the-http-api-from-scripts"><a class="anchor" href="#use-the-http-api-from-scripts">Use the HTTP API from scripts</a></h2>
+<p><strong>Settings → Agents</strong> shows the address (for example <code>http://127.0.0.1:47821</code>) and a token. The address and token are also in <code>agent.json</code>:</p>
+<ul>
+<li>macOS: <code>~/Library/Application Support/app.opencharts.desktop/agent.json</code></li>
+<li>Windows: <code>%APPDATA%\app.opencharts.desktop\agent.json</code></li>
+<li>Linux: <code>~/.local/share/app.opencharts.desktop/agent.json</code></li>
+</ul>
+<p>Send the token as a bearer token. Requests with an <code>Origin</code> header are refused.</p>
+<pre><code class="language-bash">TOKEN=...   # from Settings → Agents
+curl -s http://127.0.0.1:47821/v1/commands -H &quot;Authorization: Bearer $TOKEN&quot;
+
+curl -s -X POST http://127.0.0.1:47821/v1/commands/open_symbol \
+	-H &quot;Authorization: Bearer $TOKEN&quot; -d &#39;{&quot;symbol&quot;: &quot;ETH-USD&quot;}&#39;
+
+curl -s -X POST http://127.0.0.1:47821/v1/commands/add_drawing \
+	-H &quot;Authorization: Bearer $TOKEN&quot; \
+	-d &#39;{&quot;tool&quot;: &quot;hline&quot;, &quot;points&quot;: [{&quot;time&quot;: 1763856000, &quot;price&quot;: 3400}], &quot;text&quot;: &quot;support&quot;}&#39;
+</code></pre>
+<p>Each call returns <code>{&quot;ok&quot;: true, &quot;result&quot;: ...}</code> or <code>{&quot;ok&quot;: false, &quot;error&quot;: &quot;...&quot;}</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>200</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>The arguments are wrong. The error says which field and why.</td>
+</tr>
+<tr>
+<td>401, 403</td>
+<td>Bad token, or the access level doesn&#39;t allow this command.</td>
+</tr>
+<tr>
+<td>404</td>
+<td>No such command.</td>
+</tr>
+<tr>
+<td>500</td>
+<td>The command failed, for example because a data source was unreachable.</td>
+</tr>
+<tr>
+<td>504</td>
+<td>Nobody answered an approval prompt in time, or the app is busy.</td>
+</tr>
+</tbody></table>
+<p>Press <strong>New token</strong> in <strong>Settings → Agents</strong> if the token leaks. Scripts that use the old token stop working.</p>
+<p>The API runs at the access level you picked. Under <strong>Ask before acting</strong>, a call that changes something waits until you answer the prompt.</p>
+<h3 id="from-a-terminal"><a class="anchor" href="#from-a-terminal">From a terminal</a></h3>
+<p>The Stockyard program also has a command line mode that reads <code>agent.json</code> for you:</p>
+<pre><code class="language-bash">Stockyard cli list
+Stockyard cli get_app_state
+Stockyard cli set_timeframe &#39;{&quot;timeframe&quot;: &quot;4h&quot;}&#39;
+</code></pre>
+<p>It prints the JSON result and exits with 0 on success and 1 on failure. Calls from it show as <strong>Command line</strong> in the activity list.</p>
+<h3 id="mcp-over-http"><a class="anchor" href="#mcp-over-http">MCP over HTTP</a></h3>
+<p><code>POST /mcp</code> speaks MCP (Streamable HTTP, JSON responses only, protocol <code>2025-06-18</code>, older versions accepted). <code>initialize</code> returns an <code>Mcp-Session-Id</code> header. A session id the app doesn&#39;t know, for example after Stockyard restarted, gets a 404 so the client starts a new session.</p>
+<h2 id="see-what-agents-did"><a class="anchor" href="#see-what-agents-did">See what agents did</a></h2>
+<p><strong>Settings → Agents → What agents did</strong> lists every call: the time, the agent, what it asked for, and whether it was done, refused or failed. <strong>Clear</strong> empties the list. The app keeps the last 500 calls. Agents can read the same list with <code>get_agent_log</code>.</p>
+<h2 id="tips-for-agents-and-prompt-writers"><a class="anchor" href="#tips-for-agents-and-prompt-writers">Tips for agents and prompt writers</a></h2>
+<ul>
+<li>Call <code>get_app_state</code> first. It lists the charts, numbered from 0, and each chart&#39;s indicators with ids.</li>
+<li>Commands that take <code>chart</code> use the active chart when you leave it out.</li>
+<li>Symbols look like <code>BTC-USD</code> for crypto and <code>tradier:AAPL</code> for stocks. <code>search_symbols</code> finds them. A bare ticker such as <code>AAPL</code> or <code>ETH</code> is looked up.</li>
+<li>Times are Unix seconds (UTC), the same as bar times from <code>get_bars</code>.</li>
+<li>Drawings belong to a symbol and show on every timeframe. <code>list_drawing_tools</code> says how many points each tool takes. The user can undo an agent&#39;s drawing with ⌘Z or Ctrl+Z.</li>
+<li><code>get_chart_snapshot</code> returns a PNG of the chart with the numbers behind it. Drawings and alert lines are a separate layer, so they are listed as data and are not in the picture.</li>
+</ul>
+<h2 id="commands"><a class="anchor" href="#commands">Commands</a></h2>
+<p>Each command is an MCP tool with the same name and a route at <code>POST /v1/commands/&lt;name&gt;</code>. &quot;Look&quot; commands work at every level except <strong>Off</strong>. &quot;Change&quot; commands need <strong>Ask before acting</strong> or <strong>Full control</strong>. <code>GET /v1/commands</code> and MCP <code>tools/list</code> give each command&#39;s full description and input schema.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Kind</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>get_app_state</code></td>
+<td>look</td>
+<td>Layout, charts, indicators, theme, workspace, watchlists, alert counts, widgets, replay and the time.</td>
+</tr>
+<tr>
+<td><code>get_settings</code></td>
+<td>look</td>
+<td>Settings by name, all or some.</td>
+</tr>
+<tr>
+<td><code>update_settings</code></td>
+<td>change</td>
+<td>Change settings with a patch. Each value must have the same kind as the default. Lists, the access level, and values with their own commands are refused.</td>
+</tr>
+<tr>
+<td><code>set_chart_appearance</code></td>
+<td>change</td>
+<td>Chart type, Renko, Kagi and point &amp; figure bricks, volume profile, colors, legend, volume, scales, countdown, background, grid, crosshair, text size and watermark.</td>
+</tr>
+<tr>
+<td><code>list_chart_types</code></td>
+<td>look</td>
+<td>Every chart type, the brick settings each uses, and the current brick and volume profile settings.</td>
+</tr>
+<tr>
+<td><code>list_themes</code></td>
+<td>look</td>
+<td>Every theme and which one is active.</td>
+</tr>
+<tr>
+<td><code>set_theme</code></td>
+<td>change</td>
+<td>Switch the theme by id or name.</td>
+</tr>
+<tr>
+<td><code>get_theme</code></td>
+<td>look</td>
+<td>A theme&#39;s colors, palette, moving background and share code.</td>
+</tr>
+<tr>
+<td><code>create_theme</code></td>
+<td>change</td>
+<td>Make your own theme from a copy or a share code, with changes, and switch to it.</td>
+</tr>
+<tr>
+<td><code>update_theme</code></td>
+<td>change</td>
+<td>Change one of your own themes: name, light or dark, colors, palette or moving background.</td>
+</tr>
+<tr>
+<td><code>delete_theme</code></td>
+<td>change</td>
+<td>Delete one of your own themes.</td>
+</tr>
+<tr>
+<td><code>search_symbols</code></td>
+<td>look</td>
+<td>Find crypto pairs, stocks and ETFs.</td>
+</tr>
+<tr>
+<td><code>get_data_sources</code></td>
+<td>look</td>
+<td>Which provider serves US stocks and options, and whether its keys are saved (never the keys).</td>
+</tr>
+<tr>
+<td><code>set_stocks_source</code></td>
+<td>change</td>
+<td>Get US stocks from Alpaca, Tradier, or whichever is set up.</td>
+</tr>
+<tr>
+<td><code>get_bars</code></td>
+<td>look</td>
+<td>OHLCV bars for a symbol and timeframe.</td>
+</tr>
+<tr>
+<td><code>open_symbol</code></td>
+<td>change</td>
+<td>Show a symbol on a chart.</td>
+</tr>
+<tr>
+<td><code>set_timeframe</code></td>
+<td>change</td>
+<td>Change a chart&#39;s bar length. A typed timeframe that isn&#39;t a preset stays in the timeframe menu.</td>
+</tr>
+<tr>
+<td><code>edit_timeframes</code></td>
+<td>change</td>
+<td>Star or unstar timeframes for the toolbar, and add or remove your own timeframes in the menu.</td>
+</tr>
+<tr>
+<td><code>list_layouts</code></td>
+<td>look</td>
+<td>The 1 to 8 chart layouts.</td>
+</tr>
+<tr>
+<td><code>set_layout</code></td>
+<td>change</td>
+<td>Switch layout.</td>
+</tr>
+<tr>
+<td><code>arrange_charts</code></td>
+<td>change</td>
+<td>Grid column and row sizes, or free boxes: move, resize, add, close and lock charts.</td>
+</tr>
+<tr>
+<td><code>focus_chart</code></td>
+<td>change</td>
+<td>Make a chart the active one.</td>
+</tr>
+<tr>
+<td><code>set_chart_sync</code></td>
+<td>change</td>
+<td>Link symbol, timeframe, crosshair or date range across charts.</td>
+</tr>
+<tr>
+<td><code>maximize_chart</code></td>
+<td>change</td>
+<td>Let the active chart fill the area, or bring the layout back.</td>
+</tr>
+<tr>
+<td><code>reset_chart_view</code></td>
+<td>change</td>
+<td>Scroll back to the latest bars and fit the price scale.</td>
+</tr>
+<tr>
+<td><code>get_chart_snapshot</code></td>
+<td>look</td>
+<td>A PNG of a chart plus its bars, indicator values, drawings and alerts.</td>
+</tr>
+<tr>
+<td><code>replay</code></td>
+<td>change</td>
+<td>Bar replay on the active chart: start, play, pause, step and stop.</td>
+</tr>
+<tr>
+<td><code>list_indicators</code></td>
+<td>look</td>
+<td>The indicators and their settings, with your own marked.</td>
+</tr>
+<tr>
+<td><code>compute_indicator</code></td>
+<td>look</td>
+<td>An indicator&#39;s recent values, without adding it to a chart.</td>
+</tr>
+<tr>
+<td><code>add_indicator</code></td>
+<td>change</td>
+<td>Put an indicator on a chart.</td>
+</tr>
+<tr>
+<td><code>update_indicator</code></td>
+<td>change</td>
+<td>Change an indicator&#39;s settings, colors, widths, styles or visibility.</td>
+</tr>
+<tr>
+<td><code>remove_indicator</code></td>
+<td>change</td>
+<td>Take an indicator off a chart.</td>
+</tr>
+<tr>
+<td><code>move_indicator</code></td>
+<td>change</td>
+<td>Change an indicator&#39;s place in the legend and pane order.</td>
+</tr>
+<tr>
+<td><code>set_indicators_visible</code></td>
+<td>change</td>
+<td>Show or hide several indicators, or all of them.</td>
+</tr>
+<tr>
+<td><code>delete_stack</code></td>
+<td>change</td>
+<td>Delete one of your saved stacks.</td>
+</tr>
+<tr>
+<td><code>get_custom_indicator</code></td>
+<td>look</td>
+<td>The code of one of your own indicators, and its last error.</td>
+</tr>
+<tr>
+<td><code>save_custom_indicator</code></td>
+<td>change</td>
+<td>Check and save indicator code, new or as a new version. It runs in the indicator sandbox.</td>
+</tr>
+<tr>
+<td><code>delete_custom_indicator</code></td>
+<td>change</td>
+<td>Delete one of your own indicators, from every chart too.</td>
+</tr>
+<tr>
+<td><code>list_stacks</code></td>
+<td>look</td>
+<td>Saved indicator stacks.</td>
+</tr>
+<tr>
+<td><code>apply_stack</code></td>
+<td>change</td>
+<td>Replace or add a chart&#39;s indicators from a stack.</td>
+</tr>
+<tr>
+<td><code>save_stack</code></td>
+<td>change</td>
+<td>Save a chart&#39;s indicators as a stack.</td>
+</tr>
+<tr>
+<td><code>compare_symbol</code></td>
+<td>change</td>
+<td>Draw another symbol over a chart, on the same % scale or its own scale.</td>
+</tr>
+<tr>
+<td><code>remove_compare</code></td>
+<td>change</td>
+<td>Take compared symbols off a chart.</td>
+</tr>
+<tr>
+<td><code>get_correlation</code></td>
+<td>look</td>
+<td>How closely symbols move together, as a matrix from -1 to 1.</td>
+</tr>
+<tr>
+<td><code>get_option_expirations</code></td>
+<td>look</td>
+<td>A US stock&#39;s option expiration dates, with days left and the monthlies.</td>
+</tr>
+<tr>
+<td><code>get_option_chain</code></td>
+<td>look</td>
+<td>Calls and puts by strike around the money, with quotes, IV and greeks.</td>
+</tr>
+<tr>
+<td><code>open_option</code></td>
+<td>change</td>
+<td>Chart one option contract.</td>
+</tr>
+<tr>
+<td><code>set_options_settings</code></td>
+<td>change</td>
+<td>The options chain panel&#39;s columns, strikes and layout.</td>
+</tr>
+<tr>
+<td><code>list_drawing_tools</code></td>
+<td>look</td>
+<td>Every drawing tool and how many points it takes.</td>
+</tr>
+<tr>
+<td><code>set_drawing_toolbar</code></td>
+<td>change</td>
+<td>Favorite tools, the favorites bar, the tool rail and its groups, as Customize toolbar sets them.</td>
+</tr>
+<tr>
+<td><code>list_drawings</code></td>
+<td>look</td>
+<td>The drawings on a symbol.</td>
+</tr>
+<tr>
+<td><code>add_drawing</code></td>
+<td>change</td>
+<td>Draw with any tool.</td>
+</tr>
+<tr>
+<td><code>update_drawing</code></td>
+<td>change</td>
+<td>Move, restyle, relabel, lock or hide a drawing. It can save the new style as the tool&#39;s default.</td>
+</tr>
+<tr>
+<td><code>remove_drawing</code></td>
+<td>change</td>
+<td>Delete a drawing.</td>
+</tr>
+<tr>
+<td><code>clear_drawings</code></td>
+<td>change</td>
+<td>Delete every drawing on a symbol.</td>
+</tr>
+<tr>
+<td><code>remove_drawings</code></td>
+<td>change</td>
+<td>Delete several drawings in one undo step.</td>
+</tr>
+<tr>
+<td><code>update_drawings</code></td>
+<td>change</td>
+<td>Hide, show, lock or unlock several drawings, or all of them.</td>
+</tr>
+<tr>
+<td><code>move_drawing</code></td>
+<td>change</td>
+<td>Bring a drawing to the front, send it back, or put it at a position.</td>
+</tr>
+<tr>
+<td><code>get_fib_settings</code></td>
+<td>look</td>
+<td>The levels and options of a Fib drawing or a Fib tool&#39;s default.</td>
+</tr>
+<tr>
+<td><code>set_fib_settings</code></td>
+<td>change</td>
+<td>Change a Fib drawing&#39;s levels and options, save them as the tool default, or reset.</td>
+</tr>
+<tr>
+<td><code>list_alerts</code></td>
+<td>look</td>
+<td>Alerts with a plain description and status.</td>
+</tr>
+<tr>
+<td><code>create_alert</code></td>
+<td>change</td>
+<td>Alert on a value, a zone, a drawing, an indicator, or a move within some bars. Uses your alert defaults.</td>
+</tr>
+<tr>
+<td><code>update_alert</code></td>
+<td>change</td>
+<td>Change an alert. It becomes active again.</td>
+</tr>
+<tr>
+<td><code>pause_alerts</code></td>
+<td>change</td>
+<td>Pause alerts.</td>
+</tr>
+<tr>
+<td><code>resume_alerts</code></td>
+<td>change</td>
+<td>Turn alerts back on.</td>
+</tr>
+<tr>
+<td><code>delete_alerts</code></td>
+<td>change</td>
+<td>Delete alerts.</td>
+</tr>
+<tr>
+<td><code>get_alert_log</code></td>
+<td>look</td>
+<td>Alerts that fired or expired.</td>
+</tr>
+<tr>
+<td><code>list_workspaces</code></td>
+<td>look</td>
+<td>Saved workspaces.</td>
+</tr>
+<tr>
+<td><code>get_workspace</code></td>
+<td>look</td>
+<td>One workspace, whether it has unsaved changes, and its share code.</td>
+</tr>
+<tr>
+<td><code>save_workspace</code></td>
+<td>change</td>
+<td>Save the open workspace, save the screen as a new one, or add a shared one from its code.</td>
+</tr>
+<tr>
+<td><code>rename_workspace</code></td>
+<td>change</td>
+<td>Rename a workspace.</td>
+</tr>
+<tr>
+<td><code>delete_workspace</code></td>
+<td>change</td>
+<td>Delete a workspace. The last one stays.</td>
+</tr>
+<tr>
+<td><code>revert_workspace</code></td>
+<td>change</td>
+<td>Undo the open workspace&#39;s changes since it was last saved.</td>
+</tr>
+<tr>
+<td><code>open_workspace</code></td>
+<td>change</td>
+<td>Switch workspace.</td>
+</tr>
+<tr>
+<td><code>list_watchlists</code></td>
+<td>look</td>
+<td>Watchlists with sections and symbols.</td>
+</tr>
+<tr>
+<td><code>add_to_watchlist</code></td>
+<td>change</td>
+<td>Add a symbol, at the end or in a section.</td>
+</tr>
+<tr>
+<td><code>remove_from_watchlist</code></td>
+<td>change</td>
+<td>Remove a symbol.</td>
+</tr>
+<tr>
+<td><code>edit_watchlist</code></td>
+<td>change</td>
+<td>Rename a watchlist, reorder it, and add, rename, fold or remove sections.</td>
+</tr>
+<tr>
+<td><code>switch_watchlist</code></td>
+<td>change</td>
+<td>Show another watchlist.</td>
+</tr>
+<tr>
+<td><code>list_widget_types</code></td>
+<td>look</td>
+<td>Widgets you can add and their settings.</td>
+</tr>
+<tr>
+<td><code>list_widgets</code></td>
+<td>look</td>
+<td>Widgets on screen.</td>
+</tr>
+<tr>
+<td><code>add_widget</code></td>
+<td>change</td>
+<td>Add a widget.</td>
+</tr>
+<tr>
+<td><code>update_widget</code></td>
+<td>change</td>
+<td>Move, resize, collapse, lock or configure a widget.</td>
+</tr>
+<tr>
+<td><code>remove_widget</code></td>
+<td>change</td>
+<td>Close a widget.</td>
+</tr>
+<tr>
+<td><code>list_screener_fields</code></td>
+<td>look</td>
+<td>Every screener field, the filter operators, timeframes and sources.</td>
+</tr>
+<tr>
+<td><code>list_screens</code></td>
+<td>look</td>
+<td>Built-in and saved screens, and the one in the screener now.</td>
+</tr>
+<tr>
+<td><code>run_screen</code></td>
+<td>look</td>
+<td>Filter the market with a screen or your own filters and get the rows. Waits for candles up to a timeout.</td>
+</tr>
+<tr>
+<td><code>show_screen</code></td>
+<td>change</td>
+<td>Put a screen, or changed filters, columns and sort, in the screener panel.</td>
+</tr>
+<tr>
+<td><code>save_screen</code></td>
+<td>change</td>
+<td>Save the screener&#39;s screen, as a new one or over the saved one it came from.</td>
+</tr>
+<tr>
+<td><code>delete_screen</code></td>
+<td>change</td>
+<td>Delete a saved screen.</td>
+</tr>
+<tr>
+<td><code>screen_to_watchlist</code></td>
+<td>change</td>
+<td>Make a watchlist from a screen&#39;s results.</td>
+</tr>
+<tr>
+<td><code>list_strategies</code></td>
+<td>look</td>
+<td>Built-in and saved strategies, the one in the Strategy Tester, and the words rules use.</td>
+</tr>
+<tr>
+<td><code>run_backtest</code></td>
+<td>look</td>
+<td>Backtest a strategy (built-in, saved, rules or TypeScript) on any symbol and timeframe. Returns stats, trades and the equity curve.</td>
+</tr>
+<tr>
+<td><code>show_backtest</code></td>
+<td>change</td>
+<td>Load a strategy and settings into the Strategy Tester, so its trades show on the chart.</td>
+</tr>
+<tr>
+<td><code>save_strategy</code></td>
+<td>change</td>
+<td>Save the tester&#39;s strategy, over the saved one or as a new one.</td>
+</tr>
+<tr>
+<td><code>delete_strategy</code></td>
+<td>change</td>
+<td>Delete a saved strategy.</td>
+</tr>
+<tr>
+<td><code>get_events</code></td>
+<td>look</td>
+<td>News, earnings and SEC filings for a symbol, newest first.</td>
+</tr>
+<tr>
+<td><code>set_event_settings</code></td>
+<td>change</td>
+<td>Which events show on the chart, which sources are asked, and the News panel&#39;s view.</td>
+</tr>
+<tr>
+<td><code>search_community</code></td>
+<td>look</td>
+<td>Find themes, indicators, stacks, workspaces and plugins in the community library, with each one&#39;s trust level.</td>
+</tr>
+<tr>
+<td><code>get_community_item</code></td>
+<td>look</td>
+<td>One item in full, optionally with its checksum-verified file.</td>
+</tr>
+<tr>
+<td><code>install_community_item</code></td>
+<td>change</td>
+<td>Install or update an item. The prompt and the activity list name its trust level. A plugin installs only after you allow it, or under Full control.</td>
+</tr>
+<tr>
+<td><code>share_to_community</code></td>
+<td>change</td>
+<td>Open the filled-in submission form for something you made. You submit it on GitHub.</td>
+</tr>
+<tr>
+<td><code>list_plugins</code></td>
+<td>look</td>
+<td>Installed plugins, whether each is running, and optionally their code.</td>
+</tr>
+<tr>
+<td><code>set_plugin_enabled</code></td>
+<td>change</td>
+<td>Turn a plugin on or off. On runs its code with full access, and the prompt says so.</td>
+</tr>
+<tr>
+<td><code>remove_plugin</code></td>
+<td>change</td>
+<td>Uninstall a plugin.</td>
+</tr>
+<tr>
+<td><code>set_panel</code></td>
+<td>change</td>
+<td>Open or close the watchlist, alerts, screener, object tree, options chain, news, strategy tester, widgets or the assistant.</td>
+</tr>
+<tr>
+<td><code>list_app_commands</code></td>
+<td>look</td>
+<td>Every command-bar and shortcut command, with its keys.</td>
+</tr>
+<tr>
+<td><code>run_app_command</code></td>
+<td>change</td>
+<td>Run any of those commands, as its shortcut does.</td>
+</tr>
+<tr>
+<td><code>set_shortcut</code></td>
+<td>change</td>
+<td>Give a key to a command, added or replacing one.</td>
+</tr>
+<tr>
+<td><code>remove_shortcut</code></td>
+<td>change</td>
+<td>Take a key off a command.</td>
+</tr>
+<tr>
+<td><code>reset_shortcuts</code></td>
+<td>change</td>
+<td>Put one command&#39;s keys, or all, back to the defaults.</td>
+</tr>
+<tr>
+<td><code>get_sync_status</code></td>
+<td>look</td>
+<td>Whether sync is on, through a folder or a gist, what syncs, the last sync, and the other computers. Never the gist id or the GitHub token.</td>
+</tr>
+<tr>
+<td><code>set_sync_settings</code></td>
+<td>change</td>
+<td>Change what syncs, rename this computer, or turn sync off. Only you can turn it on.</td>
+</tr>
+<tr>
+<td><code>sync_now</code></td>
+<td>change</td>
+<td>Sync with your other computers now.</td>
+</tr>
+<tr>
+<td><code>get_agent_log</code></td>
+<td>look</td>
+<td>Recent agent calls and how each ended.</td>
+</tr>
+</tbody></table>
+<p><code>tests/agentDocs.test.ts</code> fails when a command is missing from this table.</p>
+<h2 id="add-a-command"><a class="anchor" href="#add-a-command">Add a command</a></h2>
+<p>All commands live in one table, <code>COMMANDS</code> in <code>src/agent/commands.ts</code>, built from the files in <code>src/agent/commands/</code>. Each entry has a name, a description written for a language model, an access kind (<code>read</code> or <code>act</code>), an input schema made with <code>s</code> from <code>src/agent/schema.ts</code>, a one-line summary for the approval prompt, and a <code>run</code> function that calls the same stores as the UI. The schema gives MCP clients a JSON Schema and parses the arguments before <code>run</code> sees them.</p>
+<p>A new feature adds a file in <code>src/agent/commands/</code> and spreads its commands into <code>COMMANDS</code>. MCP, the HTTP API, the command line and the permission checks then cover it with no other change. Add a row to the table above too, and map the feature in <code>src/agent/coverage.ts</code>: a test fails when a command-bar command, a Settings page or a setting has no agent command and no reason it stays with the user. <a href="testing.html#adding-a-feature-add-its-agent-commands">Testing</a> has the steps.</p>
+<p>The desktop side of the bridge (the local server, the <code>mcp</code> and <code>cli</code> modes, and Claude Desktop setup) is described in <a href="agents-contract.html">agents-contract.md</a>.</p>
+</main>
+</div>
+</body>
+</html>

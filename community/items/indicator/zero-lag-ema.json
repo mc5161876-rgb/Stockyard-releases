@@ -1,0 +1,9 @@
+{
+  "id": "zero-lag-ema",
+  "kind": "indicator",
+  "name": "Zero-Lag EMA",
+  "description": "An EMA fed with price plus its own recent change, so it turns with price instead of after it.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["moving average", "trend", "overlay"]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy, safety, and questions · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html" aria-current="page">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Privacy, safety, and questions</h1>
+<h2 id="does-stockyard-cost-anything"><a class="anchor" href="#does-stockyard-cost-anything">Does Stockyard cost anything?</a></h2>
+<p>No. Stockyard is free and open source under the Apache 2.0 license. Crypto data from Coinbase is free. Tradier offers a free developer sandbox with delayed stock data.</p>
+<h2 id="can-stockyard-trade-or-move-my-money"><a class="anchor" href="#can-stockyard-trade-or-move-my-money">Can Stockyard trade or move my money?</a></h2>
+<p>No. Stockyard reads market data only. It has no code path to orders or to your brokerage account. The Tradier connection can reach only market-data endpoints: quotes, history, time and sales, symbol lookup, and the market clock and calendar.</p>
+<h2 id="where-is-my-tradier-token-stored"><a class="anchor" href="#where-is-my-tradier-token-stored">Where is my Tradier token stored?</a></h2>
+<p>In your computer&#39;s keychain: Keychain on Mac and Credential Manager on Windows. Stockyard tests the token with Tradier before it saves it. After that, only the app&#39;s native backend reads it. The chart window, plugins, custom indicators, and AI agents never see it.</p>
+<h2 id="does-stockyard-send-my-data-anywhere"><a class="anchor" href="#does-stockyard-send-my-data-anywhere">Does Stockyard send my data anywhere?</a></h2>
+<p>Stockyard talks to Coinbase and Tradier to get market data, and checks the public Stockyard releases page for updates. Widgets you add fetch their own data: live scores from ESPN, the X feed from X with your key, and Fear &amp; Greed from alternative.me. Stock logos in the watchlist load from financialmodelingprep.com. Stockyard has no account system, no analytics, and no tracking.</p>
+<h2 id="are-custom-indicators-and-plugins-safe"><a class="anchor" href="#are-custom-indicators-and-plugins-safe">Are custom indicators and plugins safe?</a></h2>
+<p>Custom indicators run in a sandbox with no access to your keys or the internet. Plugins are full JavaScript files, so install only plugins from people you trust, the same as any app add-on.</p>
+<h2 id="why-does-my-computer-warn-me-the-first-time-i-open-stockyard"><a class="anchor" href="#why-does-my-computer-warn-me-the-first-time-i-open-stockyard">Why does my computer warn me the first time I open Stockyard?</a></h2>
+<p>The installers are not signed with a paid Apple or Microsoft developer account. <a href="getting-started.html">Getting started</a> shows the one extra click you need on first launch. After that, updates are signed with the Stockyard project&#39;s own key, and the app checks that signature before it installs an update.</p>
+<h2 id="which-computers-does-stockyard-run-on"><a class="anchor" href="#which-computers-does-stockyard-run-on">Which computers does Stockyard run on?</a></h2>
+<p>Mac (Apple Silicon and Intel) and Windows 10 or 11.</p>
+<h2 id="where-do-i-report-a-bug-or-ask-for-a-feature"><a class="anchor" href="#where-do-i-report-a-bug-or-ask-for-a-feature">Where do I report a bug or ask for a feature?</a></h2>
+<p>Open an issue on the <a href="https://github.com/mc5161876-rgb/Stockyard-releases/issues" target="_blank" rel="noopener">Stockyard releases repository</a>.</p>
+</main>
+</div>
+</body>
+</html>

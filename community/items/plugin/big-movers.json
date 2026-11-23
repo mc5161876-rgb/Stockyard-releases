@@ -1,0 +1,9 @@
+{
+  "id": "big-movers",
+  "kind": "plugin",
+  "name": "Big movers",
+  "description": "Adds a Big movers widget that lists the biggest 24h moves among the coins you pick, plus a purple Grape theme.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["widget", "crypto", "example"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "volume-weighted-rsi",
+  "kind": "indicator",
+  "name": "Volume-Weighted RSI",
+  "description": "RSI where each bar's move counts in proportion to its volume, so heavy-volume moves matter more than quiet drift.",
+  "author": "Stockyard team",
+  "version": "1.0.0",
+  "tags": ["momentum", "volume", "oscillator"]
+}

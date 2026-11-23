@@ -1,0 +1,17 @@
+{
+  "type": "stockyard-workspace",
+  "version": 1,
+  "name": "Crypto majors",
+  "state": {
+    "layout": "4",
+    "activeChart": 0,
+    "chartSync": { "symbol": false, "interval": true, "crosshair": true, "time": false },
+    "maximized": false,
+    "charts": [
+      { "id": "c0", "symbol": "BTC-USD", "timeframe": "1h", "indicators": [{ "id": "w1", "type": "ema", "params": { "length": 21, "source": "close" }, "colors": {}, "visible": true }] },
+      { "id": "c1", "symbol": "ETH-USD", "timeframe": "1h", "indicators": [{ "id": "w2", "type": "ema", "params": { "length": 21, "source": "close" }, "colors": {}, "visible": true }] },
+      { "id": "c2", "symbol": "SOL-USD", "timeframe": "1h", "indicators": [{ "id": "w3", "type": "ema", "params": { "length": 21, "source": "close" }, "colors": {}, "visible": true }] },
+      { "id": "c3", "symbol": "XRP-USD", "timeframe": "1h", "indicators": [{ "id": "w4", "type": "ema", "params": { "length": 21, "source": "close" }, "colors": {}, "visible": true }] }
+    ]
+  }
+}

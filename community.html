@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community library · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html" aria-current="page">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Community library</h1>
+<p>The <strong>Community</strong> window in Stockyard lists themes, indicators, indicator stacks, workspaces, and plugins that people shared. You open it from the <strong>Community</strong> button at the top of the window. Installing an item needs no account and no token.</p>
+<h2 id="where-the-library-lives"><a class="anchor" href="#where-the-library-lives">Where the library lives</a></h2>
+<p>The source is <code>community/items/</code> in this repository. Each item is two files in <code>community/items/&lt;kind&gt;/</code>:</p>
+<ul>
+<li><code>&lt;id&gt;.json</code> is the listing: <code>id</code>, <code>kind</code>, <code>name</code>, <code>description</code>, <code>author</code>, <code>version</code>, <code>tags</code>, and an optional <code>minAppVersion</code>.</li>
+<li><code>&lt;id&gt;.&lt;kind&gt;.&lt;ext&gt;</code> is the file that Stockyard installs, such as <code>fjord.theme.json</code> or <code>big-movers.plugin.js</code>.</li>
+</ul>
+<p><code>scripts/build-community.mjs</code> checks every item and writes <code>community/dist/</code>. The output has <code>index.json</code>, the files, the README, and the submission issue form. <code>index.json</code> adds a <code>file</code> path, a <code>sha256</code>, and an <code>updatedAt</code> date to each listing.</p>
+<p>The <strong>Community library</strong> workflow (<code>.github/workflows/community.yml</code>) runs on each push to <code>main</code> that changes the library. It builds <code>community/dist/</code> and pushes the result to the public <a href="https://github.com/mc5161876-rgb/Stockyard-community" target="_blank" rel="noopener"><code>mc5161876-rgb/Stockyard-community</code></a> repository with the <code>RELEASES_TOKEN</code> secret. On the first run, it creates that repository. The app reads <code>https://raw.githubusercontent.com/mc5161876-rgb/Stockyard-community/main/index.json</code>.</p>
+<p><code>community/README.md</code> is also the public repository&#39;s README. It explains how to submit an item and how maintainers add one.</p>
+<h2 id="how-an-install-stays-safe"><a class="anchor" href="#how-an-install-stays-safe">How an install stays safe</a></h2>
+<ol>
+<li>The app downloads the item&#39;s file from the same repository as the index.</li>
+<li>The app hashes the bytes with SHA-256. If the hash differs from the one in the index, the app refuses the file and changes nothing.</li>
+<li>The kind&#39;s own importer reads the file. Themes go through <code>importThemeCode</code>, stacks through <code>importStack</code>, and workspaces through <code>importWorkspace</code>. Each importer drops anything it does not recognize.</li>
+<li>Indicators are checked and run in the indicator sandbox. See <a href="custom-indicators.html">custom-indicators.md</a>.</li>
+<li>Plugins run with full access to the app. The app shows a confirm step that says so and can show the code. The plugin installs only after the user clicks <strong>Install plugin</strong>.</li>
+</ol>
+<p>The app records each installed item&#39;s id and version in <code>settings.hubInstalled</code>. When the library lists a different version, the item&#39;s button changes to <strong>Update</strong>. An update runs the install again and replaces the old copy.</p>
+<p>Each kind&#39;s label, trust level, installer, and share text live in one table, <code>KINDS</code> in <code>src/community/kinds.ts</code>.</p>
+<h2 id="how-sharing-works"><a class="anchor" href="#how-sharing-works">How sharing works</a></h2>
+<p><strong>Community → Share</strong> lists the user&#39;s own themes, indicators, stacks, workspaces, and plugins. <strong>Share</strong> copies the item to the clipboard and opens the library&#39;s submission form on GitHub, filled in. If the link would be longer than 7000 characters, the form opens without the content, and the user pastes it from the clipboard.</p>
+<h2 id="try-the-library-locally"><a class="anchor" href="#try-the-library-locally">Try the library locally</a></h2>
+<ol>
+<li>Run <code>node scripts/build-community.mjs --serve</code>. It builds <code>community/dist/</code> and serves it on <code>http://localhost:1421/</code>.</li>
+<li>In another terminal, run <code>VITE_COMMUNITY_BASE=http://localhost:1421/ npm run dev</code>.</li>
+<li>Open <code>http://localhost:1420/</code> and click <strong>Community</strong>.</li>
+</ol>
+<p><code>VITE_COMMUNITY_BASE</code> works only in the browser preview. The desktop app can reach only the hosts in <code>src-tauri/capabilities/default.json</code>.</p>
+</main>
+</div>
+</body>
+</html>

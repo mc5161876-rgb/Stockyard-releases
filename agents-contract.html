@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent bridge contract (Rust shell &lt;-&gt; web view) · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html" aria-current="page">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Agent bridge contract (Rust shell &lt;-&gt; web view)</h1>
+<p>Goal: AI agents (Claude Desktop, Claude Code, scripts) control Stockyard through one
+command registry that lives in the web view. Rust is a dumb, authenticated pipe.</p>
+<h2 id="discovery-file"><a class="anchor" href="#discovery-file">Discovery file</a></h2>
+<p><code>&lt;data_dir&gt;/app.opencharts.desktop/agent.json</code>, where <code>&lt;data_dir&gt;</code> is</p>
+<ul>
+<li>macOS: <code>$HOME/Library/Application Support</code></li>
+<li>Windows: <code>%APPDATA%</code></li>
+<li>Linux: <code>$XDG_DATA_HOME</code> or <code>$HOME/.local/share</code></li>
+</ul>
+<p>Contents: <code>{ &quot;port&quot;: 47821, &quot;token&quot;: &quot;&lt;64 hex chars&gt;&quot;, &quot;pid&quot;: 1234 }</code>. Mode 0600 on Unix.
+The token is created once and reused across launches (so HTTP clients keep working);
+<code>agent_regenerate_token</code> replaces it. The file is removed (or <code>port</code> set to null) when the server stops.</p>
+<h2 id="http-server-rust-src-tauri-src-agent-rs"><a class="anchor" href="#http-server-rust-src-tauri-src-agent-rs">HTTP server (Rust, <code>src-tauri/src/agent.rs</code>)</a></h2>
+<p>Listens on <code>127.0.0.1</code> only, port 47821, falling back to any free port. Runs only while enabled.
+Every request must have:</p>
+<ul>
+<li><code>Host</code> of <code>127.0.0.1:&lt;port&gt;</code> or <code>localhost:&lt;port&gt;</code></li>
+<li>no <code>Origin</code> header (blocks web pages in a browser)</li>
+<li><code>Authorization: Bearer &lt;token&gt;</code>
+Otherwise 403 (401 for a bad token). Body limit 2 MB. Anything that passes is forwarded.</li>
+</ul>
+<p>Forwarding: Rust emits the Tauri event <code>agent://request</code> with payload</p>
+<pre><code class="language-ts">{ id: number; method: string; path: string; headers: Record&lt;string, string&gt;; body: string }
+</code></pre>
+<p><code>headers</code> holds lowercased names, only: <code>content-type</code>, <code>mcp-session-id</code>, <code>x-stockyard-client</code>, <code>accept</code>.
+The web view answers with <code>invoke(&quot;agent_reply&quot;, { id, status, headers, body })</code>
+(<code>headers: Record&lt;string,string&gt;</code>, <code>body: string</code>). Rust waits up to 180 s (approval prompts),
+then replies 504.</p>
+<h2 id="routes-handled-in-the-web-view-src-agent-http-ts"><a class="anchor" href="#routes-handled-in-the-web-view-src-agent-http-ts">Routes (handled in the web view, <code>src/agent/http.ts</code>)</a></h2>
+<ul>
+<li><code>POST /mcp</code> MCP Streamable HTTP, JSON responses only (no SSE). Notifications -&gt; 202, empty body.
+<code>initialize</code> returns an <code>Mcp-Session-Id</code> header. <code>GET /mcp</code> and <code>DELETE /mcp</code> -&gt; 405.</li>
+<li><code>GET /v1/commands</code> -&gt; <code>{ commands: [{ name, title, description, access, inputSchema }] }</code></li>
+<li><code>POST /v1/commands/&lt;name&gt;</code> with a JSON object body -&gt; <code>{ ok: true, result }</code> or <code>{ ok: false, error }</code>
+(status 200 / 400 bad input / 403 not allowed / 404 unknown / 500).</li>
+</ul>
+<h2 id="tauri-commands-rust"><a class="anchor" href="#tauri-commands-rust">Tauri commands (Rust)</a></h2>
+<ul>
+<li><code>agent_set_enabled(enabled: bool) -&gt; AgentStatus</code></li>
+<li><code>agent_status() -&gt; AgentStatus</code></li>
+<li><code>agent_reply(id: u64, status: u16, headers: HashMap&lt;String,String&gt;, body: String)</code></li>
+<li><code>agent_regenerate_token() -&gt; AgentStatus</code></li>
+<li><code>agent_install_claude_desktop() -&gt; { configPath: string }</code>: merges
+<code>mcpServers.stockyard = { command: &lt;current exe&gt;, args: [&quot;mcp&quot;] }</code> into Claude Desktop&#39;s
+<code>claude_desktop_config.json</code> (macOS <code>~/Library/Application Support/Claude/</code>, Windows
+<code>%APPDATA%\Claude\</code>), keeping every other key, after writing a <code>.bak</code> copy.</li>
+</ul>
+<pre><code class="language-ts">interface AgentStatus { running: boolean; port: number | null; url: string | null; exePath: string; discoveryPath: string; token: string | null; error?: string }
+</code></pre>
+<h2 id="same-binary-two-extra-modes-src-tauri-src-main-rs"><a class="anchor" href="#same-binary-two-extra-modes-src-tauri-src-main-rs">Same binary, two extra modes (<code>src-tauri/src/main.rs</code>)</a></h2>
+<ul>
+<li><code>Stockyard mcp</code>: stdio MCP bridge. Reads newline-delimited JSON-RPC from stdin, POSTs each to
+<code>/mcp</code> (token + port from agent.json, re-read on each failure), writes each JSON response on one
+line to stdout. Remembers <code>clientInfo.name</code> from <code>initialize</code> and the <code>Mcp-Session-Id</code>, sends them
+as <code>x-stockyard-client</code> / <code>mcp-session-id</code>. If Stockyard is not reachable, a request with an id
+gets a JSON-RPC error: &quot;Stockyard isn&#39;t open, or Allow agents is off (Settings &gt; Agents).&quot;
+Never starts the GUI.</li>
+<li><code>Stockyard cli &lt;command&gt; [json-args]</code> and <code>Stockyard cli list</code>: one POST to
+<code>/v1/commands/&lt;command&gt;</code>, prints the JSON result, exit code 0/1. On Windows it attaches to the
+parent console first so output shows.</li>
+</ul>
+</main>
+</div>
+</body>
+</html>

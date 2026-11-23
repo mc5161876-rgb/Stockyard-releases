@@ -1,0 +1,9 @@
+{
+  "name": "Volatility squeeze",
+  "description": "Bollinger Bands, Keltner Channels and Bollinger band width",
+  "indicators": [
+    { "type": "bb", "params": { "length": 20, "mult": 2, "maType": "sma", "source": "close" }, "colors": {}, "visible": true },
+    { "type": "kc", "params": { "length": 20, "mult": 1.5, "atrLength": 10, "source": "close" }, "colors": {}, "visible": true },
+    { "type": "bbw", "params": { "length": 20, "mult": 2, "maType": "sma", "source": "close" }, "colors": {}, "visible": true }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "evergreen",
+  "name": "Evergreen",
+  "description": "Deep forest greens with a slow aurora",
+  "bg": "#0e1512",
+  "panel": "#131c18",
+  "panelAlt": "#18241f",
+  "border": "#22322b",
+  "hover": "#1d2b25",
+  "grid": "#14201b",
+  "text": "#e2eee7",
+  "muted": "#86a094",
+  "up": "#4ade80",
+  "down": "#f87171",
+  "crosshair": "#5f7a6e",
+  "accent": "#34d399",
+  "palette": ["#34d399", "#facc15", "#60a5fa", "#f472b6", "#a3e635", "#fb923c"],
+  "animation": { "kind": "aurora", "intensity": 0.45, "speed": 0.8, "colors": ["#10b981", "#22d3ee", "#a3e635"] }
+}

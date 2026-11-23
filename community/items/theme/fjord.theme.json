@@ -1,0 +1,18 @@
+{
+  "id": "fjord",
+  "name": "Fjord",
+  "description": "Cool arctic blues and soft frost greens",
+  "bg": "#1f232b",
+  "panel": "#252a33",
+  "panelAlt": "#2b313c",
+  "border": "#343b48",
+  "hover": "#313845",
+  "grid": "#252a32",
+  "text": "#e5e9f0",
+  "muted": "#8e98aa",
+  "up": "#a3be8c",
+  "down": "#d0727b",
+  "crosshair": "#66728a",
+  "accent": "#88c0d0",
+  "palette": ["#88c0d0", "#ebcb8b", "#b48ead", "#a3be8c", "#d08770", "#81a1c1"]
+}

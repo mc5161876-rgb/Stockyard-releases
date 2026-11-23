@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html" aria-current="page">Testing</a></div></nav>
+  <main class="doc"><h1>Testing</h1>
+<p>Every feature ships with tests. Two kinds, both run on every pull request.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Where</th>
+<th>Run locally</th>
+<th>What it checks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unit</td>
+<td><code>tests/*.test.ts</code> (Vitest)</td>
+<td><code>npm test</code></td>
+<td>Pure logic: indicator math, alert conditions, drawing geometry, layouts, parsing.</td>
+</tr>
+<tr>
+<td>End to end</td>
+<td><code>e2e/*.spec.ts</code> (Playwright)</td>
+<td><code>npm run e2e</code></td>
+<td>The real app in a real browser: click, type, reload, and see the result on screen.</td>
+</tr>
+</tbody></table>
+<p>CI (<code>.github/workflows/ci.yml</code>) runs typecheck, unit tests, the build, the end-to-end suite and <code>cargo check</code>. Merge a pull request only when every check is green.</p>
+<h2 id="the-fake-market"><a class="anchor" href="#the-fake-market">The fake market</a></h2>
+<p>End-to-end tests never touch the internet. <code>e2e/fixtures.ts</code> fakes Coinbase:</p>
+<ul>
+<li>REST (<code>/products</code>, <code>/candles</code>, <code>/stats</code>) answers with the same smooth price wave every run.</li>
+<li>The WebSocket accepts subscriptions; <code>await market.trade(&quot;BTC-USD&quot;, 71000)</code> pushes a live trade, so a test can move the price.</li>
+<li>Every other outside host is blocked.</li>
+</ul>
+<p>Use the <code>app</code> fixture to get the page already loaded with the welcome guide dismissed. Use <code>page</code> plus <code>market</code> to test first launch.</p>
+<h2 id="the-fake-desktop"><a class="anchor" href="#the-fake-desktop">The fake desktop</a></h2>
+<p>US stocks, options and saved keys only work in the desktop app. <code>test.use({ desktop: { tradier: true, alpaca: true } })</code> runs the app as if it were the desktop app, with a fake backend (<code>e2e/desktop.ts</code>):</p>
+<ul>
+<li>The <code>tradier_*</code> and <code>alpaca_*</code> commands answer like Tradier&#39;s and Alpaca&#39;s APIs: quotes, history, option expirations and chains with greeks. AAPL trades at 230.60, so 230 is the strike at the money.</li>
+<li>The keys you name start out saved, <code>desktop: {}</code> starts with none, and keys saved in Settings survive <code>app.reload()</code>. The fake accepts Alpaca key IDs that start with <code>PK</code>.</li>
+<li><code>assistant_send</code> answers like Anthropic&#39;s Messages API, from a scripted model. Ask it for a 4 hour chart and it calls <code>set_timeframe</code>. A message with &quot;wait&quot; takes a minute, so a test can press Stop. <code>desktop: { anthropic: true }</code> starts with an Anthropic key saved, and <code>window.__assistantRequests</code> holds every request the app sent.</li>
+<li>Other desktop commands (sync, news keys, the updater) answer as if nothing were set up, and Coinbase still comes from the fake market.</li>
+</ul>
+<h2 id="adding-a-test-for-your-feature"><a class="anchor" href="#adding-a-test-for-your-feature">Adding a test for your feature</a></h2>
+<ol>
+<li><p>Unit-test the logic in <code>tests/&lt;feature&gt;.test.ts</code>. Keep logic in plain <code>.ts</code> modules so it is testable without React.</p>
+</li>
+<li><p>Add <code>e2e/&lt;feature&gt;.spec.ts</code> for the main user flow:</p>
+<pre><code class="language-ts">import { test, expect } from &quot;./fixtures&quot;;
+
+test(&quot;a live trade updates the watchlist and a click opens the chart&quot;, async ({ app, market }) =&gt; {
+  await market.trade(&quot;SOL-USD&quot;, 155.55);
+  await expect(app.getByText(&quot;155.55&quot;).first()).toBeVisible();
+  await app.getByText(&quot;SOL&quot;, { exact: true }).click();
+  await expect(app.getByText(&quot;SOL/USD · 1h · Coinbase&quot;)).toBeVisible();
+});
+</code></pre>
+</li>
+<li><p>Assert what a user sees: text, titles, roles, a value that survives <code>app.reload()</code>. Find elements by <code>getByTitle</code>, <code>getByRole</code>, <code>getByLabel</code> or <code>getByPlaceholder</code>. When nothing visible identifies an element (an SVG shape, a canvas overlay), add <code>data-testid</code>.</p>
+</li>
+<li><p>Never add <code>waitForTimeout</code> to wait for the app. Wait on what the user would see with <code>expect(...)</code>. If the app needs time to start listening (like an alert loading history), retry the action inside <code>expect(async () =&gt; { ... }).toPass()</code>.</p>
+</li>
+<li><p>Run <code>npx playwright test --repeat-each=5 e2e/&lt;feature&gt;.spec.ts</code> before pushing. A test that fails once in five is a bug in the test or the app, not noise.</p>
+</li>
+</ol>
+<h2 id="adding-a-feature-add-its-agent-commands"><a class="anchor" href="#adding-a-feature-add-its-agent-commands">Adding a feature? Add its agent commands</a></h2>
+<p>AI agents use the whole app through the commands in <code>src/agent/commands/</code> (<a href="agents.html#add-a-command">Control Stockyard with AI agents</a>). A feature isn&#39;t done until an agent can do what its UI does.</p>
+<ol>
+<li>Put the feature&#39;s actions in plain <code>.ts</code> functions that the UI and the agent command both call, so they can&#39;t drift apart.</li>
+<li>Add the commands, with a row each in the table in <code>docs/agents.md</code>, and test them through <code>call()</code> from <code>tests/agentHelpers.ts</code>.</li>
+<li>Map the feature in <code>src/agent/coverage.ts</code>. A new command-bar command or Settings page doesn&#39;t compile until it has a row there. A new setting that <code>update_settings</code> can&#39;t write fails <code>tests/agentCoverage.test.ts</code> until it has one.</li>
+<li>Something only a person can do, like picking a file or entering a key, gets <code>{ uiOnly: &quot;&lt;why&gt;&quot; }</code> in place of commands.</li>
+</ol>
+<h2 id="debugging-a-failure"><a class="anchor" href="#debugging-a-failure">Debugging a failure</a></h2>
+<p>CI uploads <code>e2e-report</code> (screenshots and traces) when the suite fails. Locally, <code>npx playwright test --trace on</code> then <code>npx playwright show-trace test-results/&lt;test&gt;/trace.zip</code>.</p>
+</main>
+</div>
+</body>
+</html>

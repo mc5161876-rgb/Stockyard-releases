@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing a trading strategy · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html" aria-current="page">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>Testing a trading strategy</h1>
+<p>Open the <strong>Strategy Tester</strong> from the toolbar to see how a strategy would have traded the active chart&#39;s symbol and timeframe. Pick a built-in strategy, change its rules in plain sentences (&quot;Buy when EMA 9 crosses above EMA 21&quot;), or write your own in TypeScript. The tester re-runs as you change anything and shows the trades on the chart, an equity curve, performance figures and a list of trades.</p>
+<p>Under <strong>Settings</strong> you choose the starting capital, order size, commission, slippage, trade direction, an optional stop loss and take profit, and how many of the latest bars to test (up to 5,000; the chart loads more history when needed). <strong>Save…</strong> keeps a strategy under <strong>My strategies</strong>.</p>
+<h2 id="how-trades-are-simulated"><a class="anchor" href="#how-trades-are-simulated">How trades are simulated</a></h2>
+<ul>
+<li>A signal on a bar is acted on at the <strong>next bar&#39;s open</strong>, so a strategy never trades on a price it couldn&#39;t have known.</li>
+<li><strong>Stop loss</strong> and <strong>take profit</strong> are checked inside every bar against its high and low. If one bar reaches both, the tester assumes the stop came first (the cautious guess). If a bar opens past a level, the fill is at the open.</li>
+<li>A buy signal while short (or a sell-short signal while long) closes the position. When <strong>Trade direction</strong> is &quot;Both&quot; it also opens the other side.</li>
+<li><strong>Commission</strong> is charged on both sides as a percent of the trade&#39;s value. <strong>Slippage</strong> makes each fill that percent worse.</li>
+<li>A position still open at the last bar shows as the open trade. It counts in the equity curve, not in the trade figures.</li>
+<li>During bar replay only the bars up to the replay time are tested.</li>
+</ul>
+<h2 id="writing-your-own"><a class="anchor" href="#writing-your-own">Writing your own</a></h2>
+<p>Open the strategy menu in the tester, pick <strong>New strategy in code</strong>, then click <strong>Edit code</strong>. A strategy file looks like this:</p>
+<pre><code class="language-ts">export default strategy({
+  name: &quot;EMA Cross with RSI filter&quot;,
+  description: &quot;Buy when the fast EMA crosses above the slow one, unless RSI is overbought.&quot;,
+  params: {
+    fast: input.length(9, &quot;Fast EMA&quot;),
+    slow: input.length(21, &quot;Slow EMA&quot;),
+    maxRsi: input.float(70, &quot;Skip buys above RSI&quot;, { min: 1, max: 100 }),
+  },
+  run(bars, params, ta) {
+    const close = ta.source(bars, &quot;close&quot;);
+    const fast = ta.ema(close, params.fast);
+    const slow = ta.ema(close, params.slow);
+    const rsi = ta.rsi(close, 14);
+    const up = ta.crossover(fast, slow);
+    const down = ta.crossunder(fast, slow);
+    return {
+      enterLong: up.map((cross, i) =&gt; cross &amp;&amp; (rsi[i] ?? 0) &lt; params.maxRsi),
+      exitLong: down,
+      enterShort: down,
+      exitShort: up,
+    };
+  },
+});
+</code></pre>
+<p><code>run</code> gets the chart&#39;s candles (<code>{ time, open, high, low, close, volume }</code>, oldest first), the current <code>params</code>, and <code>ta</code>, the same building blocks custom indicators use (see <a href="custom-indicators.html">custom-indicators.md</a>). It returns one <code>true</code>/<code>false</code> per bar for any of <code>enterLong</code>, <code>exitLong</code>, <code>enterShort</code> and <code>exitShort</code>. Missing lists mean &quot;never&quot;, numbers count as true when they aren&#39;t 0, and anything else counts as false.</p>
+<p><code>params</code> take the same <code>input</code> helpers as indicators: <code>length</code>, <code>int</code>, <code>float</code>, <code>source</code>, <code>select</code>, <code>bool</code>. They show up as settings in the tester.</p>
+<p>Strategies run in the same sandbox as custom indicators: they only see the candles, never your settings, keys, files or the internet. One that runs longer than 5 seconds is stopped.</p>
+</main>
+</div>
+</body>
+</html>

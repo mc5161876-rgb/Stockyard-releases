@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Stockyard assistant · Stockyard docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%229%22%20rx%3D%221%22%20fill%3D%22%2326a69a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%23ef5350%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2210%22%20rx%3D%221%22%20fill%3D%22%232962ff%22%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  <a class="brand" href="index.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="4" height="9" rx="1" fill="#26a69a"/><rect x="10" y="10" width="4" height="10" rx="1" fill="#ef5350"/><rect x="17" y="4" width="4" height="10" rx="1" fill="#2962ff"/></svg><span>Stockyard</span><small>docs</small></a>
+  <a class="download" href="https://github.com/mc5161876-rgb/Stockyard-releases/releases/latest" target="_blank" rel="noopener">Download</a>
+</header>
+<div class="wrap">
+  <nav class="side"><div class="group"><div class="group-title">Use Stockyard</div><a href="index.html">Home</a><a href="getting-started.html">Getting started</a><a href="features.html">Feature guide</a><a href="assistant.html" aria-current="page">AI assistant</a><a href="agents.html">AI agents</a><a href="faq.html">Privacy and FAQ</a></div><div class="group"><div class="group-title">Build on Stockyard</div><a href="custom-indicators.html">Your own indicators</a><a href="strategies.html">Your own strategies</a><a href="plugins.html">Plugins</a><a href="agents-contract.html">Agent bridge internals</a><a href="community.html">Community library</a><a href="contributing.html">Contributing</a><a href="testing.html">Testing</a></div></nav>
+  <main class="doc"><h1>The Stockyard assistant</h1>
+<p>The assistant is a chat beside your charts. Ask in plain words, and it works Stockyard for you. It opens charts, changes timeframes, adds indicators, draws, sets alerts and changes layouts.</p>
+<ul>
+<li>&quot;Mark support and resistance on BTC.&quot;</li>
+<li>&quot;Add a 200 EMA and alert me if the price crosses it.&quot;</li>
+<li>&quot;Show ETH and SOL side by side on the daily chart.&quot;</li>
+</ul>
+<p>The assistant uses the same commands as <a href="agents.html">outside AI agents</a>, so it can do everything they can. It only reads market data. It can&#39;t place trades or move money.</p>
+<p>The assistant works in the desktop app. You bring the AI yourself. Use your own Anthropic or OpenAI API key and pay them for what you use, or run a free model on your own computer with Ollama. Stockyard never signs in to a Claude or ChatGPT subscription.</p>
+<h2 id="open-the-assistant"><a class="anchor" href="#open-the-assistant">Open the assistant</a></h2>
+<p>Click the chat bubble in the top bar, press ⌘J (Ctrl+J on Windows), or choose <strong>Show or hide the assistant</strong> in the command bar. Press ⌘J again to hide it. Drag the panel&#39;s left edge to make it wider.</p>
+<h2 id="set-it-up"><a class="anchor" href="#set-it-up">Set it up</a></h2>
+<p>Open <strong>Settings → Assistant</strong>, or click <strong>Set up the assistant</strong> in the panel.</p>
+<h3 id="with-claude-or-gpt"><a class="anchor" href="#with-claude-or-gpt">With Claude or GPT</a></h3>
+<ol>
+<li>Under <strong>Who answers</strong>, pick <strong>Claude (Anthropic)</strong> or <strong>GPT (OpenAI)</strong>.</li>
+<li>Make an API key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> or <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>.</li>
+<li>Paste it into the key box and press <strong>Save &amp; test</strong>. Stockyard checks the key with the provider before it saves it.</li>
+<li>Pick a model. Claude Sonnet 5.5 is the default. To use a model that isn&#39;t listed, choose <strong>Another model</strong> and type its id.</li>
+</ol>
+<h3 id="with-ollama-for-free"><a class="anchor" href="#with-ollama-for-free">With Ollama, for free</a></h3>
+<ol>
+<li>Install <a href="https://ollama.com/download" target="_blank" rel="noopener">Ollama</a> and download a model that can use tools, such as <code>qwen3</code> or <code>llama3.1</code>.</li>
+<li>Under <strong>Who answers</strong>, pick <strong>Ollama (free)</strong>.</li>
+<li>Leave the address at <code>http://localhost:11434</code>, or type the address of a computer on your home network. Press <strong>Test connection</strong>.</li>
+<li>Pick a model from the list. <strong>Can act</strong> marks models that can use Stockyard&#39;s tools. <strong>Sees charts</strong> marks models that can look at chart pictures.</li>
+</ol>
+<p>Local models are slower and make more mistakes than Claude or GPT. They also get a shorter list of 21 core commands, so they fit in a small context window.</p>
+<h2 id="choose-what-the-assistant-may-do"><a class="anchor" href="#choose-what-the-assistant-may-do">Choose what the assistant may do</a></h2>
+<p><strong>Settings → Assistant → What the assistant may do</strong> works like the level for agents, but it is separate. You can let the assistant act while outside agents stay off.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>What the assistant can do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Off</strong></td>
+<td>Nothing. Stockyard sends no requests.</td>
+</tr>
+<tr>
+<td><strong>Read only</strong></td>
+<td>Look at charts, prices, drawings, alerts and settings. Each change is refused, and the assistant tells you so.</td>
+</tr>
+<tr>
+<td><strong>Ask before acting</strong> (default)</td>
+<td>Look freely. Each change shows a prompt. Press <strong>Allow</strong> or <strong>Deny</strong>.</td>
+</tr>
+<tr>
+<td><strong>Full control</strong></td>
+<td>Change anything without asking.</td>
+</tr>
+</tbody></table>
+<p>Only you can change this level. The assistant can&#39;t read or change it, and neither can agents. It stays on this computer and doesn&#39;t sync.</p>
+<p>Every call the assistant makes shows in <strong>Settings → Agents → What agents did</strong>, under the name &quot;Assistant&quot;.</p>
+<h2 id="use-the-chat"><a class="anchor" href="#use-the-chat">Use the chat</a></h2>
+<ul>
+<li>Each step shows as a line under the reply. The line says what the step did and whether it was done, refused, failed or not run. A refused or failed line also says why.</li>
+<li><strong>Stop</strong> ends the request. A change that is waiting for your answer is denied.</li>
+<li>The assistant stops after 15 steps for one message, so a request can&#39;t run up your bill. Press <strong>Keep going</strong> to let it continue.</li>
+<li><strong>New chat</strong> (the plus button) clears the conversation.</li>
+<li>The chat is saved on this computer, so it is still there after a restart. Chart pictures are not saved.</li>
+</ul>
+<p>When something goes wrong, the panel says what happened. A rejected key or a missing model has an <strong>Open settings</strong> button. A busy provider, a rate limit or a lost connection has <strong>Try again</strong>. If Ollama isn&#39;t running, the panel says so. Open the Ollama app and try again.</p>
+<h2 id="what-leaves-your-computer"><a class="anchor" href="#what-leaves-your-computer">What leaves your computer</a></h2>
+<p>With Claude or GPT, each message sends these to Anthropic or OpenAI:</p>
+<ul>
+<li>what you type, and the chat so far;</li>
+<li>the current time, your time zone and the active chart&#39;s symbol and timeframe;</li>
+<li>whatever the assistant reads in Stockyard, such as prices, your drawings and alerts, and chart pictures.</li>
+</ul>
+<p>With Ollama, all of this stays on your computer or your home network.</p>
+<p>Your API keys stay in your computer&#39;s keychain, which is Keychain on Mac and Credential Manager on Windows. Only the app&#39;s native backend reads them. The chat, plugins, agents and sync never see them.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works">How it works</a></h2>
+<p>This section is for contributors.</p>
+<ul>
+<li><strong>Keys and network.</strong> <code>src-tauri/src/assistant.rs</code> keeps the keys and makes every request. It only calls Anthropic&#39;s messages and models endpoints, OpenAI&#39;s chat completions and models endpoints, and the Ollama address you set. That address must be this computer or one on a private network. It never follows redirects.</li>
+<li><strong>One conversation, three adapters.</strong> <code>src/assistant/conversation.ts</code> holds the chat in one shape. <code>src/assistant/providers.ts</code> turns it into each provider&#39;s request and reads each answer back. Anthropic&#39;s own reply blocks are kept and sent back unchanged.</li>
+<li><strong>The loop.</strong> <code>src/assistant/loop.ts</code> sends the chat, runs the tool calls one at a time, and sends the results back. It stops at 15 steps or when you press Stop. Each tool call goes through <code>callCommand</code> with the client name &quot;Assistant&quot;, so access levels, the approval prompt and the action log apply.</li>
+<li><strong>Tests.</strong> <code>tests/assistant*.test.ts</code> cover the adapters, the loop and the access rules. <code>e2e/assistant.spec.ts</code> runs the panel against a scripted fake model in the <a href="testing.html#the-fake-desktop">fake desktop</a>.</li>
+</ul>
+</main>
+</div>
+</body>
+</html>
